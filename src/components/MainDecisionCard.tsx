@@ -11,7 +11,8 @@ import {
   TrendingUp,
   TrendingDown,
   Clock,
-  Crosshair
+  Crosshair,
+  Volume2
 } from 'lucide-react';
 import { DecisionSignal, CryptoSymbol } from '../types';
 
@@ -27,6 +28,7 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
   currentSymbol,
 }) => {
   const [isReasonsExpanded, setIsReasonsExpanded] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   if (!signal) {
     return (
@@ -38,7 +40,6 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
 
   const isLong = signal.direction === 'LONG';
   const isShort = signal.direction === 'SHORT';
-  const isNeutral = signal.direction === 'NEUTRAL';
 
   const probValue = isLong
     ? signal.longProbability
@@ -83,6 +84,23 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
 
   const takoMood = getTakoMood();
 
+  // Web Speech API Voice Reader for AI Verdict
+  const speakVerdict = () => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const textToSpeak = `${currentSymbol.base} sinyali. ${takoMood.quote}`;
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'tr-TR';
+      utterance.rate = 1.0;
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   return (
     <div className="relative overflow-hidden bg-white/85 border border-pink-200/80 rounded-3xl p-3.5 sm:p-5 shadow-lg shadow-pink-100/60 backdrop-blur-xl transition-all max-w-full">
       {/* Soft Pastel Ambient Glow Background */}
@@ -96,13 +114,26 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
         }`}
       />
 
-      {/* Tako Mascot Commentary Card */}
-      <div className={`p-2.5 sm:p-3 rounded-2xl border ${takoMood.bg} mb-3.5 flex items-center gap-2.5 shadow-xs transition-all max-w-full overflow-hidden`}>
-        <span className="text-xl sm:text-2xl shrink-0">{takoMood.emoji}</span>
-        <div className="text-xs font-bold leading-tight min-w-0">
-          <span className="block text-[9px] sm:text-[10px] uppercase font-black opacity-60 tracking-wider">Tako Maskot Yorumu</span>
-          <span className="truncate block">{takoMood.quote}</span>
+      {/* Tako Mascot Commentary Card with Audio Voice Reader Button */}
+      <div className={`p-2.5 sm:p-3 rounded-2xl border ${takoMood.bg} mb-3.5 flex items-center justify-between gap-2.5 shadow-xs transition-all max-w-full overflow-hidden`}>
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="text-xl sm:text-2xl shrink-0">{takoMood.emoji}</span>
+          <div className="text-xs font-bold leading-tight min-w-0">
+            <span className="block text-[9px] sm:text-[10px] uppercase font-black opacity-60 tracking-wider">Tako Maskot Yorumu</span>
+            <span className="truncate block">{takoMood.quote}</span>
+          </div>
         </div>
+
+        {/* Speech Reader Button */}
+        <button
+          onClick={speakVerdict}
+          className={`p-1.5 sm:p-2 rounded-xl border text-xs font-black shrink-0 transition-all active:scale-95 ${
+            isSpeaking ? 'bg-pink-500 text-white animate-pulse' : 'bg-white hover:bg-pink-50 border-pink-200 text-purple-900 shadow-xs'
+          }`}
+          title="Tako Yorumunu Sesli Oku"
+        >
+          <Volume2 className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Main Signal Display Grid */}
@@ -125,7 +156,7 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
           >
             {isLong && <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3] text-emerald-600 shrink-0" />}
             {isShort && <TrendingDown className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3] text-rose-600 shrink-0" />}
-            {isNeutral && <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600 shrink-0" />}
+            {signal.direction === 'NEUTRAL' && <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600 shrink-0" />}
             <span>{signal.direction}</span>
             <span className="text-lg sm:text-xl font-extrabold opacity-90">%{probValue}</span>
           </div>

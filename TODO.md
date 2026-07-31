@@ -1,51 +1,51 @@
-# 🐙 Tako v4.0 (Autonomous Alpha Trading Terminal) - Tüm Modüller & Özellikler
+# 🐙 Tako v4.0 (Autonomous Alpha Trading Terminal) - Tüm Modüller & Sade Mod
 
-Bu doküman, **ahmetbysoy/tako** projesinde geliştirdiğimiz ve GitHub repona push ettiğimiz tüm **v4.0 devrimsel modüllerini** içerir.
+Bu doküman, **ahmetbysoy/tako** projesinde geliştirdiğimiz, sadeleştirdiğimiz ve GitHub repona push ettiğimiz tüm **kullanıcı odaklı sadeleştirme ve v4.0 devrimsel modüllerini** içerir.
 
 ---
 
-## 🚀 Tako v4.0 Tamamlanan Yeni Modüller (Full Features Completed)
+## 🎯 1. Kullanıcı Odaklı Felsefe: "İnsan Makine Değildir, Zaman Değerlidir" (Yeni Sade Mod)
+
+- **Problem:** Ekranda 50 farklı karmaşık rakam, CVD, OI, Spoof Score, Brier Skoru vb. verilerin hepsinin aynı anda gösterilmesi kullanıcıda **karar yorgunluğuna (Decision Fatigue)** yol açıyordu.
+- **Çözüm:** **`⚡ Sade Mod (Minimalist Focus Mode)`** varsayılan görünüm yapıldı!
+  - 10 karmaşık matematiksel analiz motoru **arkada (under the hood)** tam kapasite çalışmaya devam eder.
+  - Ekranda kullanıcıya sadece **2 ODAK NOKTASI** sunulur:
+    1. **Neresindeyiz?** 📈 Sade Canlı Grafik (Fiyat ve Hedef Çizgileri)
+    2. **Nereye Gidiyoruz?** 🐙 Net Yön Sinyali (🚀 LONG %84 | Giriş: $98.500 | TP: $98.850 | Stop: $98.300 | Tako Maskot 1 Cümlelik Özeti)
+  - Pro analiz araçları (10 Motor Detayları, Tahta, Balina Akışı, Multi-Radar, Paper PnL) istenildiği an **`⚙️ Pro Mod`** butonuna basılarak açılabilir.
+
+---
+
+## 🚀 2. Tako v4.0 Tamamlanan Tüm Devrimsel Modüller
 
 ### 1. 🎯 Sanal İşlem Engine & Paper Trading (Paper PnL)
-- **Eklenen Bileşen:** `src/components/PaperTradingPanel.tsx`
-- **Özellikler:**
-  - $10.000 Varsayılan Sanal Bakiye ile canlı piyasada risk almadan işlem yapma.
-  - 1-Tıkla **"Sanal Long ($1.000)"** ve **"Sanal Short ($1.000)"** pozisyonu açma.
-  - Canlı fiyat değişimlerine göre anlık **Açık Pozisyon PnL (%)** hesabı ve Kar Al / Zarar Durdur seviyelerine ulaştığında otonom pozisyon kapatma.
-  - Toplam Sanal Özkaynak, Realize PnL ve Kapanan Win Rate (%) istatistikleri.
+- **Bileşen:** `src/components/PaperTradingPanel.tsx`
+- $10.000 Sanal Bakiye ile risk almadan canlı işlem yapma.
+- 1-Tıkla **"Sanal Long ($1.000)"** ve **"Sanal Short ($1.000)"** pozisyonu açma.
+- Canlı PnL hesabı, TP/SL otonom kapanışlar, Win Rate % istatistikleri.
 
 ### 2. ⚡ Akıllı Alarm & Bildirim Banner'ı (Smart Alarms)
-- **Eklenen Bileşen:** `src/components/SmartAlertBanner.tsx`
-- **Özellikler:**
-  - **Score Flip Alarmı:** Tako yön skoru aniden 30+ puan sıçradığında sesli ve görsel açılır uyarı banner'ı.
-  - **Whale Wall / Spoofing Alarmı:** Emir tahtasında sahte duvar tespit edildiğinde uyarı.
-  - **Squeeze & Cascade Alarmı:** Likidasyon ve hacim patlaması durumunda anlık bildirim.
+- **Bileşen:** `src/components/SmartAlertBanner.tsx`
+- Score Flip (Yön Sıçraması), Spoofing (Sahte Duvar) ve Likidasyon Dalgalarında anlık sesli ve görsel açılır uyarı banner'ı.
 
 ### 3. 🔍 Çoklu Sembol Taraması & Radar (Multi-Asset Screener)
-- **Eklenen Bileşen:** `src/components/MultiAssetScreener.tsx`
-- **Özellikler:**
-  - BTC, ETH, SOL, PEPE, DOGE, XRP, AVAX, LINK, SUI paritelerinin Tako Skorlarını, Yön Kararlarını ve Sinyal Güçlerini matris grid halinde izleme.
-  - **BTC Ayrışma (Divergence) Yakalayıcı:** BTC düşerken/yükselirken ayrışan altcoinlere otomatik rozet ekleme.
-  - Radar kartına 1-tıkla basarak doğrudan o coinin canlı analizine geçiş.
+- **Bileşen:** `src/components/MultiAssetScreener.tsx`
+- BTC, ETH, SOL, PEPE, DOGE, XRP, AVAX, LINK, SUI paritelerinin Tako Skorlarını, Yön Kararlarını ve Sinyal Güçlerini matris grid halinde izleme.
+- **BTC Ayrışma (Divergence) Yakalayıcı** ile ayrışan altcoinleri öne çıkarma.
 
 ### 4. 🧠 Gemini Copilot "Trade Senaryo Oluşturucu"
-- **Eklenen Bileşen:** Güncellenmiş `server.ts` & `GeminiModal.tsx`
-- **Özellikler:**
-  - Gemini AI motoru artık 10 telemetri katmanını analiz ederek Türkçe 3 net senaryo üretir:
-    1. 🟢 **Boğa Senaryosu (Bullish Case):** Kırılması gereken direnç ve hedef.
-    2. 🔴 **Ayı Senaryosu (Bearish Case):** Çökebilecek destek ve likidasyon seviyesi.
-    3. 🟨 **Range / Scalp Stratejisi:** 1-3 dakikalık scalp holding süresi ve stop kuralı.
+- **Bileşen:** `server.ts` & `GeminiModal.tsx`
+- Gemini AI motoru Türkçe 3 net senaryo üretir:
+  1. 🟢 **Boğa Senaryosu (Bullish Case)**
+  2. 🔴 **Ayı Senaryosu (Bearish Case)**
+  3. 🟨 **Range / Scalp Stratejisi**
 
 ### 5. 🐋 Smart Money & DEX Akış Radarı
-- **Eklenen Bileşen:** `src/components/SmartMoneyRadar.tsx`
-- **Özellikler:**
-  - **24h Borsa Cüzdan Netflow Visualizer:** Borsalardan soğuk cüzdanlara çekilen (outflow/birikim) veya borsalara yatırılan token miktarları.
-  - **Hyperliquid Leaderboard Whales Tracker:** Lider tablosundaki en kârlı balinaların anlık pozisyonları (`HyperWhale #1: $3.2M Long`).
+- **Bileşen:** `src/components/SmartMoneyRadar.tsx`
+- 24h Borsa Cüzdan Netflow Visualizer & Hyperliquid Leaderboard Whales Live Tracker.
 
 ### 6. 🎨 Tek Tıkla Tema Değiştirici (Dark / Pastel Mode Switcher)
-- **Eklenen Özellik:** Header ve global state entegrasyonu
-- **Özellikler:**
-  - Header'daki 🌙 / ☀️ butonuna basarak **Soft Pembe/Mor Pastel Moda** ile **Pro Cyberpunk Dark Moda** arasında anında geçiş imkanı.
+- Header'daki 🌙 / ☀️ butonuna basarak **Soft Pembe/Mor Pastel Moda** ile **Pro Cyberpunk Dark Moda** arasında anında geçiş.
 
 ---
 
@@ -54,8 +54,8 @@ Bu doküman, **ahmetbysoy/tako** projesinde geliştirdiğimiz ve GitHub repona p
 tako/
 ├── src/
 │   ├── components/
-│   │   ├── Header.tsx (Sadeleştirilmiş 1-Satır Header & Tema Switcher)
-│   │   ├── MainDecisionCard.tsx (Tako Maskot Yorumu)
+│   │   ├── Header.tsx (Sade Mod & Tema Switcher)
+│   │   ├── MainDecisionCard.tsx (Tako Maskot Yorumu & Senkronize Hedefler)
 │   │   ├── PaperTradingPanel.tsx (Sanal İşlem & Paper PnL)
 │   │   ├── MultiAssetScreener.tsx (Çoklu Sembol Radarı)
 │   │   ├── SmartMoneyRadar.tsx (Netflow & Hyperliquid Whales)
@@ -66,12 +66,12 @@ tako/
 │   │   ├── WhaleLiquidationFeed.tsx (Balina & Likidasyon)
 │   │   ├── BacktestJournal.tsx (Sinyal Geçmişi & Win-Streak)
 │   │   ├── GeminiModal.tsx (Trade Senaryoları)
-│   │   └── BottomNav.tsx (Yüzen Alt Dok Navigasyon)
+│   │   └── BottomNav.tsx (Yüzen Kaydırılabilir Alt Dok)
 │   ├── lib/
 │   │   ├── engine.ts (10-Motor Matematik Pipeline)
 │   │   ├── websocket.ts (Binance WS Stream)
 │   │   └── audio.ts (Web Audio Sinyal Sesleri)
-│   ├── App.tsx (Master Terminal Controller)
+│   ├── App.tsx (Sade Mod & Pro Mod Controller)
 │   └── types.ts (TypeScript Arayüzleri)
 ├── server.ts (Express & Gemini API Proxy)
 └── README.md
