@@ -16,32 +16,32 @@ export const WhaleLiquidationFeed: React.FC<WhaleLiquidationFeedProps> = ({
   const [activeTab, setActiveTab] = useState<'WHALES' | 'LIQUIDATIONS'>('WHALES');
 
   return (
-    <div className="bg-white/90 border border-pink-200/80 rounded-3xl p-4 shadow-sm shadow-pink-100/50 flex flex-col h-72">
+    <div className="bg-white/90 border border-pink-200/80 rounded-3xl p-3.5 sm:p-4 shadow-sm shadow-pink-100/50 flex flex-col h-72 max-w-full overflow-hidden">
       {/* Header Tabs */}
-      <div className="flex items-center justify-between border-b border-pink-100 pb-2.5 mb-2.5">
-        <div className="flex items-center gap-1.5">
+      <div className="flex items-center justify-between border-b border-pink-100 pb-2 mb-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setActiveTab('WHALES')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black transition-all ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black transition-all ${
               activeTab === 'WHALES'
                 ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-sm'
                 : 'text-purple-700 hover:bg-pink-50'
             }`}
           >
-            <Award className="w-3.5 h-3.5" />
-            <span>Balina Akışı ({whales.length})</span>
+            <Award className="w-3.5 h-3.5 shrink-0" />
+            <span>Balinalar ({whales.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('LIQUIDATIONS')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black transition-all ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black transition-all ${
               activeTab === 'LIQUIDATIONS'
                 ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-sm'
                 : 'text-purple-700 hover:bg-pink-50'
             }`}
           >
-            <Flame className="w-3.5 h-3.5" />
-            <span>Likidasyonlar ({liquidations.length})</span>
+            <Flame className="w-3.5 h-3.5 shrink-0" />
+            <span>Likidasyon ({liquidations.length})</span>
           </button>
         </div>
       </div>
@@ -61,26 +61,26 @@ export const WhaleLiquidationFeed: React.FC<WhaleLiquidationFeedProps> = ({
               return (
                 <div
                   key={w.id}
-                  className={`p-2 rounded-xl border flex items-center justify-between transition-all ${
+                  className={`p-2 rounded-xl border flex items-center justify-between gap-1 transition-all ${
                     isBuy
                       ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900'
                       : 'bg-rose-50/80 border-rose-200 text-rose-900'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="font-extrabold px-1.5 py-0.5 rounded text-[10px] bg-white border border-pink-200">
-                      {w.tier === 'MEGA' ? '🐋 MEGA BALİNA' : '🐬 BÜYÜK ALICI'}
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="font-extrabold px-1 py-0.2 rounded text-[9px] bg-white border border-pink-200 shrink-0">
+                      {w.tier === 'MEGA' ? '🐋 MEGA' : '🐬 BÜYÜK'}
                     </span>
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-slate-900 truncate">
                       ${w.price.toFixed(currentSymbol.decimals)}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="font-extrabold">
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="font-extrabold text-[11px]">
                       ${(w.notional / 1000).toFixed(1)}k
                     </span>
-                    <span className="text-[10px] text-slate-400">{dateStr}</span>
+                    <span className="text-[9px] text-slate-400">{dateStr}</span>
                   </div>
                 </div>
               );
@@ -104,24 +104,24 @@ export const WhaleLiquidationFeed: React.FC<WhaleLiquidationFeedProps> = ({
               return (
                 <div
                   key={l.id}
-                  className={`p-2 rounded-xl border flex items-center justify-between ${
+                  className={`p-2 rounded-xl border flex items-center justify-between gap-1 ${
                     isShortLiq
                       ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900'
                       : 'bg-rose-50/80 border-rose-200 text-rose-900'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1 min-w-0">
                     <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
-                    <span className="font-bold">
+                    <span className="font-bold truncate text-[11px]">
                       {isShortLiq ? '💥 SHORT SQUEEZE' : '💥 LONG DUMP'}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-slate-900">
-                      ${(l.notional / 1000).toFixed(1)}k @ ${l.price.toFixed(currentSymbol.decimals)}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="font-black text-slate-900 text-[11px]">
+                      ${(l.notional / 1000).toFixed(1)}k
                     </span>
-                    <span className="text-[10px] text-slate-400">{dateStr}</span>
+                    <span className="text-[9px] text-slate-400">{dateStr}</span>
                   </div>
                 </div>
               );

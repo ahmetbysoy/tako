@@ -250,7 +250,7 @@ export default function App() {
         const alert: SmartAlert = {
           id: Math.random().toString(),
           type: 'WHALE_WALL',
-          title: `🛡️ SPUOFING & BALİNA DUVARI ALARMI`,
+          title: `🛡️ SPOOFING & BALİNA DUVARI ALARMI`,
           description: `Emir tahtasında %${orderBook.spoofScore} sahte duvar tespiti yapıldı!`,
           timestamp: now,
           severity: 'MEDIUM',
@@ -502,7 +502,7 @@ export default function App() {
   const isDark = theme === 'dark';
 
   return (
-    <div className={`min-h-screen font-sans selection:bg-pink-300 selection:text-purple-950 custom-scrollbar pb-24 transition-colors duration-300 ${
+    <div className={`min-h-screen font-sans selection:bg-pink-300 selection:text-purple-950 custom-scrollbar pb-28 sm:pb-24 transition-colors duration-300 max-w-full overflow-x-hidden ${
       isDark ? 'bg-slate-950 text-slate-100' : 'bg-gradient-to-b from-pink-50 via-purple-50/50 to-pink-100/60 text-slate-800'
     }`}>
       {/* Sleek Ultra-Compact Single-Row Header */}
@@ -526,7 +526,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto p-3 sm:p-5 space-y-4">
+      <main className="max-w-7xl mx-auto p-2.5 sm:p-5 space-y-3.5 sm:space-y-4 max-w-full overflow-hidden">
         {/* Smart Alert Banner */}
         <SmartAlertBanner
           alerts={smartAlerts}
@@ -535,13 +535,13 @@ export default function App() {
         />
 
         {/* Desktop View Switcher */}
-        <div className={`hidden md:flex items-center justify-between gap-2 p-1.5 border rounded-2xl shadow-xs transition-all ${
+        <div className={`hidden md:flex items-center justify-between gap-2 p-1.5 border rounded-2xl shadow-xs transition-all max-w-full overflow-hidden ${
           isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white/80 border-pink-200/80'
         }`}>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar no-scrollbar">
             <button
               onClick={() => { setActiveTab('signal'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
                 activeTab === 'signal' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
                   : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
@@ -551,7 +551,7 @@ export default function App() {
             </button>
             <button
               onClick={() => { setActiveTab('radar'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
                 activeTab === 'radar' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
                   : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
@@ -561,7 +561,7 @@ export default function App() {
             </button>
             <button
               onClick={() => { setActiveTab('paper'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
                 activeTab === 'paper' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
                   : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
@@ -571,7 +571,7 @@ export default function App() {
             </button>
             <button
               onClick={() => { setActiveTab('engines'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
                 activeTab === 'engines' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
                   : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
@@ -581,7 +581,7 @@ export default function App() {
             </button>
             <button
               onClick={() => { setActiveTab('charts'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
                 activeTab === 'charts' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
                   : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
@@ -591,7 +591,7 @@ export default function App() {
             </button>
             <button
               onClick={() => { setActiveTab('whales'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
                 activeTab === 'whales' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
                   : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
@@ -601,7 +601,7 @@ export default function App() {
             </button>
             <button
               onClick={() => { setActiveTab('journal'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
                 activeTab === 'journal' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
                   : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
@@ -613,7 +613,7 @@ export default function App() {
 
           <button
             onClick={() => setIsFullDashboard(!isFullDashboard)}
-            className={`px-3 py-1 text-xs font-black rounded-xl border transition-all ${
+            className={`px-3 py-1 text-xs font-black rounded-xl border transition-all shrink-0 ${
               isFullDashboard
                 ? 'bg-purple-950 text-white border-purple-900 shadow-xs'
                 : (isDark ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-pink-50 text-purple-900 border-pink-200 hover:bg-pink-100')
@@ -695,7 +695,7 @@ export default function App() {
           /* Tabbed Native Layout */
           <>
             {activeTab === 'signal' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 <MainDecisionCard
                   signal={signal}
                   currentSymbol={currentSymbol}
@@ -710,7 +710,7 @@ export default function App() {
             )}
 
             {activeTab === 'radar' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 <MultiAssetScreener
                   screenerItems={screenerItems}
                   onSelectSymbol={setCurrentSymbol}
@@ -721,7 +721,7 @@ export default function App() {
             )}
 
             {activeTab === 'paper' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 <PaperTradingPanel
                   account={paperAccount}
                   positions={paperPositions}
@@ -737,13 +737,13 @@ export default function App() {
             )}
 
             {activeTab === 'engines' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 {signal && <EnginesGrid engineScores={signal.engineScores} />}
               </div>
             )}
 
             {activeTab === 'charts' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 <CvdPriceChart
                   candles={candles}
                   currentSymbol={currentSymbol}
@@ -757,7 +757,7 @@ export default function App() {
             )}
 
             {activeTab === 'whales' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 <SmartMoneyRadar
                   currentSymbol={currentSymbol}
                   price={price}
@@ -775,7 +775,7 @@ export default function App() {
             )}
 
             {activeTab === 'journal' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 <BacktestJournal
                   records={backtestRecords}
                   onClearHistory={handleClearHistory}

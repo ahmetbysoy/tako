@@ -1,51 +1,78 @@
-# 🐙 Tako (60s Alpha Decision Engine) - Geliştirme, Tasarım & TODO Listesi
+# 🐙 Tako v4.0 (Autonomous Alpha Trading Terminal) - Tüm Modüller & Özellikler
 
-Bu dosya, **ahmetbysoy/tako** GitHub projesinin mobil uyumluluk, renk teması, header sadeleştirmesi ve eğlenceli kullanıcı deneyimi odaklı yeniden tasarımı ve yapılan geliştirmeleri içerir.
-
----
-
-## 💅 1. Yapılan Tasarım ve Mobil İyileştirmeler (Tamamlananlar)
-
-- [x] **1.1. Header Sadeleştirme (Header Bloat Cleanup)**
-  - **Eski Durum:** Header ekranın %40-%50'sini kaplıyor, 4-5 satırlık kalabalık butonlar, sub-heading metinleri, statik "Canary 3/3 OK" ve "v3.2 Pastel Mobile" rozetleri içeriyordu.
-  - **Yeni Durum:** Mobil ve masaüstünde **tek satıra düşürüldü**. Gereksiz tüm statik metinler çöpe atıldı. Kalan öğeler: `🐙 TAKO Logo`, `Coin Seçici (BTC/USDT)`, `Zaman Dilimi (1m, 3m, 5m)`, `Ses Toggle` ve `✨ AI Analiz`.
-
-- [x] **1.2. Açık Renk Pembe/Mor Pastel Tema Dönüşümü**
-  - **Eski Durum:** Koyu slate/siyah arka plan (`slate-950`).
-  - **Yeni Durum:** Şık açık pastel pembe, eflatun ve tatlı mor tonlarına geçildi (`bg-pink-50`, `bg-purple-50`, `border-pink-200`, `text-purple-950`, buzlu cam `glass-panel` efektleri).
-
-- [x] **1.3. 🐙 Tako Maskot & Eğlenceli Yorum Katmanı**
-  - Projenin adı "Tako" (Japonca Ahtapot 🐙) konseptine uygun olarak canlı ahtapot maskotu ve anlık eğlenceli durum yorumları eklendi:
-    - Boğa Sinyali: *"🐙 Tako tentacles sensing buy pressure! Squeeze incoming! 🚀"*
-    - Ayı Sinyali: *"🐙 Tako says whale dumping! Red wave incoming! 🌊"*
-    - Fake Breakout: *"🐙 Tuzak Var! Fiyat hareketi sahte kırılma! 🪤"*
-
-- [x] **1.4. 🎮 Sanal Scalp Simülatörü (1-Tap Test Trade)**
-  - Backtest günlüğüne kullanıcıların anlık sinyal kalitesini sanal olarak 1-tıkla test edebilecekleri, galibiyet serisi (win-streak) sayacı içeren eğlenceli interaktif simülatör eklendi.
-
-- [x] **1.5. Çift Navigasyon Kalabalığı Temizlendi**
-  - Header altında yer alan ve ekranı daraltan ikincil menü çubuğu silindi; alt navigasyon çubuğu (BottomNav) pastel yüzen dok (floating dock) olarak optimize edildi.
+Bu doküman, **ahmetbysoy/tako** projesinde geliştirdiğimiz ve GitHub repona push ettiğimiz tüm **v4.0 devrimsel modüllerini** içerir.
 
 ---
 
-## 🚨 2. Kritik Kod & Mimari Düzeltmeleri (Tamamlananlar)
+## 🚀 Tako v4.0 Tamamlanan Yeni Modüller (Full Features Completed)
 
-- [x] **2.1. `CalibrationPanel` Runtime Crash Çözüldü**
-  - `CalibrationPanel` bileşenindeki `undefined` nesne erişimi hatası `DecisionSignal` tipine `calibrationState` eklenerek çözüldü.
-- [x] **2.2. Bellek Sızıntısı (Memory Leak) Engellendi**
-  - `pendingSignalsRef` dizisi maksimum 50 eleman ile sınırlandı.
-- [x] **2.3. `package.json` İsim Temizliği**
-  - Proje ismi `tako` olarak güncellendi.
+### 1. 🎯 Sanal İşlem Engine & Paper Trading (Paper PnL)
+- **Eklenen Bileşen:** `src/components/PaperTradingPanel.tsx`
+- **Özellikler:**
+  - $10.000 Varsayılan Sanal Bakiye ile canlı piyasada risk almadan işlem yapma.
+  - 1-Tıkla **"Sanal Long ($1.000)"** ve **"Sanal Short ($1.000)"** pozisyonu açma.
+  - Canlı fiyat değişimlerine göre anlık **Açık Pozisyon PnL (%)** hesabı ve Kar Al / Zarar Durdur seviyelerine ulaştığında otonom pozisyon kapatma.
+  - Toplam Sanal Özkaynak, Realize PnL ve Kapanan Win Rate (%) istatistikleri.
+
+### 2. ⚡ Akıllı Alarm & Bildirim Banner'ı (Smart Alarms)
+- **Eklenen Bileşen:** `src/components/SmartAlertBanner.tsx`
+- **Özellikler:**
+  - **Score Flip Alarmı:** Tako yön skoru aniden 30+ puan sıçradığında sesli ve görsel açılır uyarı banner'ı.
+  - **Whale Wall / Spoofing Alarmı:** Emir tahtasında sahte duvar tespit edildiğinde uyarı.
+  - **Squeeze & Cascade Alarmı:** Likidasyon ve hacim patlaması durumunda anlık bildirim.
+
+### 3. 🔍 Çoklu Sembol Taraması & Radar (Multi-Asset Screener)
+- **Eklenen Bileşen:** `src/components/MultiAssetScreener.tsx`
+- **Özellikler:**
+  - BTC, ETH, SOL, PEPE, DOGE, XRP, AVAX, LINK, SUI paritelerinin Tako Skorlarını, Yön Kararlarını ve Sinyal Güçlerini matris grid halinde izleme.
+  - **BTC Ayrışma (Divergence) Yakalayıcı:** BTC düşerken/yükselirken ayrışan altcoinlere otomatik rozet ekleme.
+  - Radar kartına 1-tıkla basarak doğrudan o coinin canlı analizine geçiş.
+
+### 4. 🧠 Gemini Copilot "Trade Senaryo Oluşturucu"
+- **Eklenen Bileşen:** Güncellenmiş `server.ts` & `GeminiModal.tsx`
+- **Özellikler:**
+  - Gemini AI motoru artık 10 telemetri katmanını analiz ederek Türkçe 3 net senaryo üretir:
+    1. 🟢 **Boğa Senaryosu (Bullish Case):** Kırılması gereken direnç ve hedef.
+    2. 🔴 **Ayı Senaryosu (Bearish Case):** Çökebilecek destek ve likidasyon seviyesi.
+    3. 🟨 **Range / Scalp Stratejisi:** 1-3 dakikalık scalp holding süresi ve stop kuralı.
+
+### 5. 🐋 Smart Money & DEX Akış Radarı
+- **Eklenen Bileşen:** `src/components/SmartMoneyRadar.tsx`
+- **Özellikler:**
+  - **24h Borsa Cüzdan Netflow Visualizer:** Borsalardan soğuk cüzdanlara çekilen (outflow/birikim) veya borsalara yatırılan token miktarları.
+  - **Hyperliquid Leaderboard Whales Tracker:** Lider tablosundaki en kârlı balinaların anlık pozisyonları (`HyperWhale #1: $3.2M Long`).
+
+### 6. 🎨 Tek Tıkla Tema Değiştirici (Dark / Pastel Mode Switcher)
+- **Eklenen Özellik:** Header ve global state entegrasyonu
+- **Özellikler:**
+  - Header'daki 🌙 / ☀️ butonuna basarak **Soft Pembe/Mor Pastel Moda** ile **Pro Cyberpunk Dark Moda** arasında anında geçiş imkanı.
 
 ---
 
-## 💡 3. Gelecek Eğlenceli İyileştirme Fikirleri (Brainstorming TODO)
-
-- [ ] **3.1. 🐙 Tako 10 Dokunaç Sıvı Animasyonları**
-  - 10 analiz motoru (dokunaç) skor kazandıkça dolan pastel pembe/mor sıvı seviye animasyonları.
-- [ ] **3.2. Oyunlaştırılmış Başarım Rozetleri (Badges)**
-  - *"İlk 5'te 5 Sinyal Tutarlılığı"*, *"Ahtapot Gözü (Fake Breakout Yakalama)"*, *"Balina Avcısı"* gibi kullanıcı kazanımları.
-- [ ] **3.3. Ses Efektleri Paketi (Arcade Sound Effects)**
-  - Sanal işlem kazanıldığında "Pop / Chime", kayıp durumunda "Muted Thud" tatlı arcade ses efektleri.
-- [ ] **3.4. Telegram / Discord Sinyal Botu Entegrasyonu**
-  - Yüksek güvenli (%85+) Tako sinyallerini anında Telegram kanalına görsellerle atan bot entegrasyonu.
+## 📄 Proje Dizin Yapısı
+```
+tako/
+├── src/
+│   ├── components/
+│   │   ├── Header.tsx (Sadeleştirilmiş 1-Satır Header & Tema Switcher)
+│   │   ├── MainDecisionCard.tsx (Tako Maskot Yorumu)
+│   │   ├── PaperTradingPanel.tsx (Sanal İşlem & Paper PnL)
+│   │   ├── MultiAssetScreener.tsx (Çoklu Sembol Radarı)
+│   │   ├── SmartMoneyRadar.tsx (Netflow & Hyperliquid Whales)
+│   │   ├── SmartAlertBanner.tsx (Akıllı Alarmlar)
+│   │   ├── EnginesGrid.tsx (10 Dokunaç Motoru)
+│   │   ├── CvdPriceChart.tsx (Dual-Pane CVD)
+│   │   ├── OrderBookVisualizer.tsx (L2 Depth & Duvarlar)
+│   │   ├── WhaleLiquidationFeed.tsx (Balina & Likidasyon)
+│   │   ├── BacktestJournal.tsx (Sinyal Geçmişi & Win-Streak)
+│   │   ├── GeminiModal.tsx (Trade Senaryoları)
+│   │   └── BottomNav.tsx (Yüzen Alt Dok Navigasyon)
+│   ├── lib/
+│   │   ├── engine.ts (10-Motor Matematik Pipeline)
+│   │   ├── websocket.ts (Binance WS Stream)
+│   │   └── audio.ts (Web Audio Sinyal Sesleri)
+│   ├── App.tsx (Master Terminal Controller)
+│   └── types.ts (TypeScript Arayüzleri)
+├── server.ts (Express & Gemini API Proxy)
+└── README.md
+```
