@@ -5,6 +5,7 @@
 export type SignalDirection = 'LONG' | 'SHORT' | 'NEUTRAL';
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME';
 export type ExchangeSource = 'BINANCE' | 'OKX' | 'BYBIT' | 'SIMULATED';
+export type ThemeMode = 'pastel' | 'dark';
 
 export interface CryptoSymbol {
   symbol: string;      // e.g. "BTCUSDT"
@@ -124,7 +125,7 @@ export interface DecisionSignal {
   brierScore: number;          // Rolling Brier score (0 = perfect)
   calibrationAdjustment: number; // + / - adjustment
   regimeShiftDetected: boolean;
-  calibrationState: CalibrationState;
+  calibrationState?: CalibrationState;
   
   // DEX & Macro Engine Additions
   hlPrice?: number;
@@ -178,6 +179,54 @@ export interface BacktestRecord {
   evaluatedAt?: number;
 }
 
+// v4.0 Paper Trading Engine Types
+export interface PaperPosition {
+  id: string;
+  symbol: string;
+  direction: SignalDirection;
+  entryPrice: number;
+  currentPrice: number;
+  amountUsd: number;
+  tpPrice: number;
+  slPrice: number;
+  timestamp: number;
+  pnlUsd: number;
+  pnlPercent: number;
+  status: 'OPEN' | 'CLOSED_TP' | 'CLOSED_SL' | 'CLOSED_MANUAL';
+}
+
+export interface PaperAccount {
+  balanceUsd: number;
+  initialBalanceUsd: number;
+  realizedPnlUsd: number;
+  tradesCount: number;
+  winsCount: number;
+  lossesCount: number;
+}
+
+// v4.0 Smart Alarm Types
+export interface SmartAlert {
+  id: string;
+  type: 'SCORE_FLIP' | 'WHALE_WALL' | 'SQUEEZE_CASCADE';
+  title: string;
+  description: string;
+  timestamp: number;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH';
+}
+
+// v4.0 Multi-Asset Screener Types
+export interface SymbolScreenerItem {
+  symbol: CryptoSymbol;
+  price: number;
+  change24h: number;
+  totalScore: number;
+  direction: SignalDirection;
+  probability: number;
+  confidence: number;
+  signalStrengthIndex: number;
+  divergenceTag?: string;
+}
+
 export interface TerminalSettings {
   soundEnabled: boolean;
   timeframe: '1m' | '3m' | '5m' | '15m';
@@ -185,4 +234,5 @@ export interface TerminalSettings {
   minConfidenceThreshold: number; // e.g. 7.5
   whaleThresholdUsd: number;      // e.g. 50000
   simulationMode: boolean;
+  theme: ThemeMode;
 }

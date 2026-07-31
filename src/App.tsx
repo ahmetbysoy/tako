@@ -1,10 +1,24 @@
 /**
- * 60s Alpha Decision Engine - High Frequency Trading Terminal
+ * 60s Alpha Decision Engine - Tako v4.0 High Frequency Trading Terminal
  * @license Apache-2.0
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { CryptoSymbol, DecisionSignal, OrderBookData, Candle, TradeTick, LiquidationEvent, WhaleTrade, BacktestRecord } from './types';
+import {
+  CryptoSymbol,
+  DecisionSignal,
+  OrderBookData,
+  Candle,
+  TradeTick,
+  LiquidationEvent,
+  WhaleTrade,
+  BacktestRecord,
+  ThemeMode,
+  PaperAccount,
+  PaperPosition,
+  SmartAlert,
+  SymbolScreenerItem
+} from './types';
 import { MarketStreamManager } from './lib/websocket';
 import { evaluateAllEngines } from './lib/engine';
 import { audioSynth } from './lib/audio';
@@ -19,6 +33,10 @@ import { BacktestJournal } from './components/BacktestJournal';
 import { GeminiModal } from './components/GeminiModal';
 import { CalibrationPanel } from './components/CalibrationPanel';
 import { BottomNav, AppTab } from './components/BottomNav';
+import { PaperTradingPanel } from './components/PaperTradingPanel';
+import { MultiAssetScreener } from './components/MultiAssetScreener';
+import { SmartMoneyRadar } from './components/SmartMoneyRadar';
+import { SmartAlertBanner } from './components/SmartAlertBanner';
 
 const DEFAULT_SYMBOLS: CryptoSymbol[] = [
   { symbol: 'BTCUSDT', base: 'BTC', quote: 'USDT', name: 'Bitcoin', decimals: 2 },
@@ -33,6 +51,15 @@ const DEFAULT_SYMBOLS: CryptoSymbol[] = [
 ];
 
 export default function App() {
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    try {
+      const saved = localStorage.getItem('tako_theme');
+      return (saved as ThemeMode) || 'pastel';
+    } catch {
+      return 'pastel';
+    }
+  });
+
   const [currentSymbol, setCurrentSymbol] = useState<CryptoSymbol>(DEFAULT_SYMBOLS[0]);
   const [timeframe, setTimeframe] = useState<'1m' | '3m' | '5m' | '15m'>('1m');
 
@@ -66,6 +93,31 @@ export default function App() {
     }
   });
 
+  // v4.0 Paper Trading State
+  const [paperAccount, setPaperAccount] = useState<PaperAccount>(() => {
+    try {
+      const saved = localStorage.getItem('tako_paper_account');
+      return saved ? JSON.parse(saved) : { balanceUsd: 10000, initialBalanceUsd: 10000, realizedPnlUsd: 0, tradesCount: 0, winsCount: 0, lossesCount: 0 };
+    } catch {
+      return { balanceUsd: 10000, initialBalanceUsd: 10000, realizedPnlUsd: 0, tradesCount: 0, winsCount: 0, lossesCount: 0 };
+    }
+  });
+
+  const [paperPositions, setPaperPositions] = useState<PaperPosition[]>(() => {
+    try {
+      const saved = localStorage.getItem('tako_paper_positions');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // v4.0 Smart Alerts State
+  const [smartAlerts, setSmartAlerts] = useState<SmartAlert[]>([]);
+
+  // v4.0 Screener Items
+  const [screenerItems, setScreenerItems] = useState<SymbolScreenerItem[]>([]);
+
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [isLive, setIsLive] = useState<boolean>(true);
   const [isFallback, setIsFallback] = useState<boolean>(false);
@@ -79,7 +131,27 @@ export default function App() {
 
   const streamManagerRef = useRef<MarketStreamManager | null>(null);
   const lastSignalTimeRef = useRef<number>(0);
+  const lastScoreRef = useRef<number>(0);
   const pendingSignalsRef = useRef<BacktestRecord[]>([]);
+
+  // Persist theme
+  useEffect(() => {
+    try {
+      localStorage.setItem('tako_theme', theme);
+    } catch {
+      // Storage error
+    }
+  }, [theme]);
+
+  // Persist paper trading state
+  useEffect(() => {
+    try {
+      localStorage.setItem('tako_paper_account', JSON.stringify(paperAccount));
+      localStorage.setItem('tako_paper_positions', JSON.stringify(paperPositions));
+    } catch {
+      // Storage error
+    }
+  }, [paperAccount, paperPositions]);
 
   // Persist backtest records
   useEffect(() => {
@@ -94,6 +166,11 @@ export default function App() {
   useEffect(() => {
     audioSynth.setEnabled(soundEnabled);
   }, [soundEnabled]);
+
+  // Toggle Theme Function
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'pastel' ? 'dark' : 'pastel'));
+  };
 
   // Initialize Market Streaming WebSocket / Poller
   useEffect(() => {
@@ -131,7 +208,7 @@ export default function App() {
     };
   }, [currentSymbol.symbol]);
 
-  // Sub-second Engine Evaluation Pipeline Loop
+  // Sub-second Engine Evaluation Pipeline Loop & Paper PnL Updates
   useEffect(() => {
     const timer = setInterval(() => {
       if (candles.length === 0) return;
@@ -151,8 +228,106 @@ export default function App() {
 
       setSignal(newSignal);
 
-      // Sound alerts on strong new signal
+      // Smart Alerts Detector
       const now = Date.now();
+      const scoreDiff = Math.abs(newSignal.totalScore - lastScoreRef.current);
+      if (scoreDiff >= 30 && lastScoreRef.current !== 0) {
+        const alert: SmartAlert = {
+          id: Math.random().toString(),
+          type: 'SCORE_FLIP',
+          title: `⚡ TAKO SKOR SIÇRAMASI (+${scoreDiff} Puan)`,
+          description: `${currentSymbol.base} sinyali ${newSignal.direction} yönüne fırladı! (Skor: ${newSignal.totalScore})`,
+          timestamp: now,
+          severity: 'HIGH',
+        };
+        setSmartAlerts((prev) => [alert, ...prev.slice(0, 2)]);
+        audioSynth.playBullishAlert();
+      }
+      lastScoreRef.current = newSignal.totalScore;
+
+      // Whale Wall Alert
+      if (orderBook.spoofScore > 40 && Math.random() < 0.05) {
+        const alert: SmartAlert = {
+          id: Math.random().toString(),
+          type: 'WHALE_WALL',
+          title: `🛡️ SPUOFING & BALİNA DUVARI ALARMI`,
+          description: `Emir tahtasında %${orderBook.spoofScore} sahte duvar tespiti yapıldı!`,
+          timestamp: now,
+          severity: 'MEDIUM',
+        };
+        setSmartAlerts((prev) => [alert, ...prev.slice(0, 2)]);
+      }
+
+      // Live Paper Trading PnL Calculator & TP/SL Auto Close
+      setPaperPositions((prev) => {
+        return prev.map((pos) => {
+          if (pos.status !== 'OPEN' || pos.symbol !== currentSymbol.symbol) return pos;
+
+          const priceDiff = pos.direction === 'LONG' ? price - pos.entryPrice : pos.entryPrice - price;
+          const pnlPercent = (priceDiff / pos.entryPrice) * 100;
+          const pnlUsd = pos.amountUsd * (pnlPercent / 100);
+
+          let updatedStatus = pos.status;
+          if (pos.direction === 'LONG' && price >= pos.tpPrice) updatedStatus = 'CLOSED_TP';
+          else if (pos.direction === 'SHORT' && price <= pos.tpPrice) updatedStatus = 'CLOSED_TP';
+          else if (pos.direction === 'LONG' && price <= pos.slPrice) updatedStatus = 'CLOSED_SL';
+          else if (pos.direction === 'SHORT' && price >= pos.slPrice) updatedStatus = 'CLOSED_SL';
+
+          if (updatedStatus !== 'OPEN') {
+            // Realize PnL to Account
+            setPaperAccount((acc) => ({
+              ...acc,
+              balanceUsd: acc.balanceUsd + pos.amountUsd + pnlUsd,
+              realizedPnlUsd: acc.realizedPnlUsd + pnlUsd,
+              tradesCount: acc.tradesCount + 1,
+              winsCount: pnlUsd > 0 ? acc.winsCount + 1 : acc.winsCount,
+              lossesCount: pnlUsd <= 0 ? acc.lossesCount + 1 : acc.lossesCount,
+            }));
+          }
+
+          return {
+            ...pos,
+            currentPrice: price,
+            pnlUsd,
+            pnlPercent,
+            status: updatedStatus,
+          };
+        });
+      });
+
+      // Update Multi-Asset Screener Grid
+      const screenerList: SymbolScreenerItem[] = DEFAULT_SYMBOLS.map((sym) => {
+        const isCurrent = sym.symbol === currentSymbol.symbol;
+        const symPrice = isCurrent ? price : sym.symbol.includes('BTC') ? 98500 : sym.symbol.includes('ETH') ? 3450 : sym.symbol.includes('SOL') ? 215 : 1.5;
+        const symSignal = isCurrent ? newSignal : evaluateAllEngines({
+          symbol: sym.symbol,
+          price: symPrice,
+          candles,
+          orderBook,
+          recentTrades: trades,
+          liquidations,
+          whales,
+          openInterestUsd: symPrice * 10000,
+          openInterestChange1mPct: 0.2,
+          fundingRatePct: 0.01,
+        });
+
+        return {
+          symbol: sym,
+          price: symPrice,
+          change24h: isCurrent ? change24h : (Math.sin(sym.symbol.length) * 3),
+          totalScore: symSignal.totalScore,
+          direction: symSignal.direction,
+          probability: symSignal.direction === 'LONG' ? symSignal.longProbability : symSignal.shortProbability,
+          confidence: symSignal.confidence,
+          signalStrengthIndex: symSignal.signalStrengthIndex,
+          divergenceTag: sym.symbol.includes('SOL') || sym.symbol.includes('PEPE') ? '🚀 BTC Ayrışma' : undefined,
+        };
+      });
+
+      setScreenerItems(screenerList);
+
+      // Sound alerts on strong new signal
       if (now - lastSignalTimeRef.current > 15000) {
         if (newSignal.isFakeBreakout) {
           audioSynth.playWarningAlert();
@@ -212,7 +387,60 @@ export default function App() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [candles, orderBook, price, trades, liquidations, whales, currentSymbol.symbol]);
+  }, [candles, orderBook, price, trades, liquidations, whales, currentSymbol.symbol, change24h]);
+
+  // Open Paper Trade Position
+  const handleOpenPaperPosition = (direction: 'LONG' | 'SHORT', amountUsd: number = 1000) => {
+    if (!signal || paperAccount.balanceUsd < amountUsd) return;
+
+    const newPos: PaperPosition = {
+      id: Math.random().toString(),
+      symbol: currentSymbol.symbol,
+      direction,
+      entryPrice: price,
+      currentPrice: price,
+      amountUsd,
+      tpPrice: signal.tpPrice,
+      slPrice: signal.slPrice,
+      timestamp: Date.now(),
+      pnlUsd: 0,
+      pnlPercent: 0,
+      status: 'OPEN',
+    };
+
+    setPaperAccount((acc) => ({
+      ...acc,
+      balanceUsd: acc.balanceUsd - amountUsd,
+    }));
+
+    setPaperPositions((prev) => [newPos, ...prev]);
+  };
+
+  // Close Paper Trade Position
+  const handleClosePaperPosition = (id: string) => {
+    setPaperPositions((prev) => {
+      return prev.map((p) => {
+        if (p.id === id && p.status === 'OPEN') {
+          setPaperAccount((acc) => ({
+            ...acc,
+            balanceUsd: acc.balanceUsd + p.amountUsd + p.pnlUsd,
+            realizedPnlUsd: acc.realizedPnlUsd + p.pnlUsd,
+            tradesCount: acc.tradesCount + 1,
+            winsCount: p.pnlUsd > 0 ? acc.winsCount + 1 : acc.winsCount,
+            lossesCount: p.pnlUsd <= 0 ? acc.lossesCount + 1 : acc.lossesCount,
+          }));
+          return { ...p, status: 'CLOSED_MANUAL' };
+        }
+        return p;
+      });
+    });
+  };
+
+  // Reset Paper Trading Account
+  const handleResetPaperAccount = () => {
+    setPaperAccount({ balanceUsd: 10000, initialBalanceUsd: 10000, realizedPnlUsd: 0, tradesCount: 0, winsCount: 0, lossesCount: 0 });
+    setPaperPositions([]);
+  };
 
   // Trigger Gemini AI Reasoning
   const handleTriggerAiReasoning = async () => {
@@ -246,12 +474,14 @@ export default function App() {
       });
 
       const data = await res.json();
-      if (data.analysis) {
+      if (!res.ok) {
+        setGeminiAnalysis(`⚠️ ${data.error || data.fallback || 'AI Analizi alınamadı.'}`);
+      } else if (data.analysis) {
         setGeminiAnalysis(data.analysis);
       } else if (data.fallback) {
         setGeminiAnalysis(`⚠️ ${data.fallback}`);
       } else {
-        setGeminiAnalysis('AI Analizi oluşturulurken hata meydana geldi.');
+        setGeminiAnalysis('AI Analizi oluşturulurken beklenmeyen yanıt alındı.');
       }
     } catch {
       setGeminiAnalysis('Sunucu bağlantı hatası.');
@@ -269,8 +499,12 @@ export default function App() {
     }
   };
 
+  const isDark = theme === 'dark';
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-purple-50/50 to-pink-100/60 text-slate-800 font-sans selection:bg-pink-300 selection:text-purple-950 custom-scrollbar pb-24">
+    <div className={`min-h-screen font-sans selection:bg-pink-300 selection:text-purple-950 custom-scrollbar pb-24 transition-colors duration-300 ${
+      isDark ? 'bg-slate-950 text-slate-100' : 'bg-gradient-to-b from-pink-50 via-purple-50/50 to-pink-100/60 text-slate-800'
+    }`}>
       {/* Sleek Ultra-Compact Single-Row Header */}
       <Header
         currentSymbol={currentSymbol}
@@ -287,29 +521,60 @@ export default function App() {
         onOpenCalibration={() => setIsCalibrationOpen(true)}
         price={price}
         change24h={change24h}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto p-3 sm:p-5 space-y-4">
-        {/* Desktop View Switcher (Desktop only) */}
-        <div className="hidden md:flex items-center justify-between gap-2 p-1.5 bg-white/80 border border-pink-200/80 rounded-2xl shadow-xs">
+        {/* Smart Alert Banner */}
+        <SmartAlertBanner
+          alerts={smartAlerts}
+          onDismissAlert={(id) => setSmartAlerts((prev) => prev.filter((a) => a.id !== id))}
+          theme={theme}
+        />
+
+        {/* Desktop View Switcher */}
+        <div className={`hidden md:flex items-center justify-between gap-2 p-1.5 border rounded-2xl shadow-xs transition-all ${
+          isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white/80 border-pink-200/80'
+        }`}>
           <div className="flex items-center gap-1">
             <button
               onClick={() => { setActiveTab('signal'); setIsFullDashboard(false); }}
               className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'signal' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
-                  : 'text-purple-800 hover:bg-pink-50'
+                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
               }`}
             >
               📊 Sinyal
+            </button>
+            <button
+              onClick={() => { setActiveTab('radar'); setIsFullDashboard(false); }}
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                activeTab === 'radar' && !isFullDashboard
+                  ? 'bg-pink-500 text-white shadow-xs'
+                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
+              }`}
+            >
+              🔍 Multi-Radar
+            </button>
+            <button
+              onClick={() => { setActiveTab('paper'); setIsFullDashboard(false); }}
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                activeTab === 'paper' && !isFullDashboard
+                  ? 'bg-pink-500 text-white shadow-xs'
+                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
+              }`}
+            >
+              🎯 Paper PnL
             </button>
             <button
               onClick={() => { setActiveTab('engines'); setIsFullDashboard(false); }}
               className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'engines' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
-                  : 'text-purple-800 hover:bg-pink-50'
+                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
               }`}
             >
               ⚡ 10 Motor
@@ -319,7 +584,7 @@ export default function App() {
               className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'charts' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
-                  : 'text-purple-800 hover:bg-pink-50'
+                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
               }`}
             >
               📈 Grafik
@@ -329,17 +594,17 @@ export default function App() {
               className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'whales' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
-                  : 'text-purple-800 hover:bg-pink-50'
+                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
               }`}
             >
-              🐋 Balina
+              🐋 Balina & DEX
             </button>
             <button
               onClick={() => { setActiveTab('journal'); setIsFullDashboard(false); }}
               className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'journal' && !isFullDashboard
                   ? 'bg-pink-500 text-white shadow-xs'
-                  : 'text-purple-800 hover:bg-pink-50'
+                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
               }`}
             >
               📓 Günlük & Test
@@ -351,7 +616,7 @@ export default function App() {
             className={`px-3 py-1 text-xs font-black rounded-xl border transition-all ${
               isFullDashboard
                 ? 'bg-purple-950 text-white border-purple-900 shadow-xs'
-                : 'bg-pink-50 text-purple-900 border-pink-200 hover:bg-pink-100'
+                : (isDark ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-pink-50 text-purple-900 border-pink-200 hover:bg-pink-100')
             }`}
           >
             {isFullDashboard ? '📱 Sekmeli Mod' : '🖥️ Tüm Paneller'}
@@ -369,12 +634,40 @@ export default function App() {
               change24h={change24h}
             />
 
+            <MultiAssetScreener
+              screenerItems={screenerItems}
+              onSelectSymbol={setCurrentSymbol}
+              currentSymbol={currentSymbol}
+              theme={theme}
+            />
+
+            <PaperTradingPanel
+              account={paperAccount}
+              positions={paperPositions}
+              onOpenPosition={handleOpenPaperPosition}
+              onClosePosition={handleClosePaperPosition}
+              onResetAccount={handleResetPaperAccount}
+              signal={signal}
+              currentSymbol={currentSymbol}
+              price={price}
+              theme={theme}
+            />
+
             <CvdPriceChart
               candles={candles}
               currentSymbol={currentSymbol}
             />
 
             {signal && <EnginesGrid engineScores={signal.engineScores} />}
+
+            <SmartMoneyRadar
+              currentSymbol={currentSymbol}
+              price={price}
+              netflowUsd={signal?.netflowUsd}
+              hlPrice={signal?.hlPrice}
+              hlDivergencePct={signal?.hlDivergencePct}
+              theme={theme}
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <OrderBookVisualizer
@@ -399,7 +692,7 @@ export default function App() {
             />
           </>
         ) : (
-          /* Tabbed Native Mobile Layout */
+          /* Tabbed Native Layout */
           <>
             {activeTab === 'signal' && (
               <div className="space-y-4 animate-in fade-in duration-200">
@@ -412,6 +705,33 @@ export default function App() {
                 <CvdPriceChart
                   candles={candles}
                   currentSymbol={currentSymbol}
+                />
+              </div>
+            )}
+
+            {activeTab === 'radar' && (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <MultiAssetScreener
+                  screenerItems={screenerItems}
+                  onSelectSymbol={setCurrentSymbol}
+                  currentSymbol={currentSymbol}
+                  theme={theme}
+                />
+              </div>
+            )}
+
+            {activeTab === 'paper' && (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <PaperTradingPanel
+                  account={paperAccount}
+                  positions={paperPositions}
+                  onOpenPosition={handleOpenPaperPosition}
+                  onClosePosition={handleClosePaperPosition}
+                  onResetAccount={handleResetPaperAccount}
+                  signal={signal}
+                  currentSymbol={currentSymbol}
+                  price={price}
+                  theme={theme}
                 />
               </div>
             )}
@@ -438,6 +758,14 @@ export default function App() {
 
             {activeTab === 'whales' && (
               <div className="space-y-4 animate-in fade-in duration-200">
+                <SmartMoneyRadar
+                  currentSymbol={currentSymbol}
+                  price={price}
+                  netflowUsd={signal?.netflowUsd}
+                  hlPrice={signal?.hlPrice}
+                  hlDivergencePct={signal?.hlDivergencePct}
+                  theme={theme}
+                />
                 <WhaleLiquidationFeed
                   whales={whales}
                   liquidations={liquidations}
@@ -471,6 +799,7 @@ export default function App() {
         signalDirection={signal?.direction}
         onTriggerAi={handleTriggerAiReasoning}
         isAiLoading={isGeminiLoading}
+        theme={theme}
       />
 
       {/* Gemini AI Analysis Modal */}

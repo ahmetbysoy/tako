@@ -31,31 +31,39 @@ async function startServer() {
       const { symbol, engineSnapshot, price, signal } = req.body;
 
       const ai = new GoogleGenAI({ apiKey });
-      const prompt = `You are a High-Frequency Trading (HFT) Institutional Analyst evaluating a 60-second crypto scalp signal for ${symbol}.
+      const prompt = `You are a High-Frequency Trading (HFT) Institutional Analyst & Copilot evaluating a 60-second crypto scalp signal for ${symbol}.
 Current Price: $${price}
 Signal Direction: ${signal.direction} (${signal.probability}% probability)
 Confidence: ${signal.confidence}/10
 Risk Level: ${signal.risk}
 
 10-Engine Breakdown Snapshot:
-- Price Engine: Score ${engineSnapshot.price.score} (${engineSnapshot.price.detail})
-- Volume Engine: Score ${engineSnapshot.volume.score} (${engineSnapshot.volume.detail})
-- Order Flow Engine: Score ${engineSnapshot.orderFlow.score} (${engineSnapshot.orderFlow.detail})
-- CVD Engine: Score ${engineSnapshot.cvd.score} (${engineSnapshot.cvd.detail})
-- Order Book Engine: Score ${engineSnapshot.orderBook.score} (${engineSnapshot.orderBook.detail})
-- Open Interest Engine: Score ${engineSnapshot.openInterest.score} (${engineSnapshot.openInterest.detail})
-- Liquidation Engine: Score ${engineSnapshot.liquidation.score} (${engineSnapshot.liquidation.detail})
-- Trend Engine: Score ${engineSnapshot.trend.score} (${engineSnapshot.trend.detail})
-- Oscillator Engine: Score ${engineSnapshot.oscillator.score} (${engineSnapshot.oscillator.detail})
+- Price Engine: Score ${engineSnapshot.price?.score || 0} (${engineSnapshot.price?.detail || ''})
+- Volume Engine: Score ${engineSnapshot.volume?.score || 0} (${engineSnapshot.volume?.detail || ''})
+- Order Flow Engine: Score ${engineSnapshot.orderFlow?.score || 0} (${engineSnapshot.orderFlow?.detail || ''})
+- CVD Engine: Score ${engineSnapshot.cvd?.score || 0} (${engineSnapshot.cvd?.detail || ''})
+- Order Book Engine: Score ${engineSnapshot.orderBook?.score || 0} (${engineSnapshot.orderBook?.detail || ''})
+- Open Interest Engine: Score ${engineSnapshot.openInterest?.score || 0} (${engineSnapshot.openInterest?.detail || ''})
+- Liquidation Engine: Score ${engineSnapshot.liquidation?.score || 0} (${engineSnapshot.liquidation?.detail || ''})
+- Trend Engine: Score ${engineSnapshot.trend?.score || 0} (${engineSnapshot.trend?.detail || ''})
+- Oscillator Engine: Score ${engineSnapshot.oscillator?.score || 0} (${engineSnapshot.oscillator?.detail || ''})
 - Fake Breakout Warning: ${engineSnapshot.fakeBreakout ? 'YES - FAKE BREAKOUT DETECTED' : 'No'}
 - Whale Activity: ${engineSnapshot.whaleDetail}
 - Liquidity Magnet Target: $${engineSnapshot.liquidityMagnet}
 
-Provide a concise 3-bullet point institutional summary explaining:
-1. Primary market driver supporting or refuting this 60s scalp setup.
-2. Key risk factors (e.g. spoofing, liquidation cascades, RSI divergence).
-3. Scalp execution advice for 1-3 minute holding time.
-Keep language direct, professional, and formatted in clean Markdown.`;
+Generate 3 distinct, professional Trade Scenarios in Turkish (Türkçe) formatted in clean Markdown:
+
+### 🟢 1. Boğa Senaryosu (Bullish Case)
+- Key breakout trigger level above $${price}.
+- Target profit zone and volume requirement.
+
+### 🔴 2. Ayı Senaryosu (Bearish Case)
+- Key breakdown support level below $${price}.
+- Liquidation cascade trigger price.
+
+### 🟨 3. Range / Scalp Execution Stratejisi
+- Holding time (1-3 min), strict stop-loss advice, and Tako engine confirmation rule.
+Keep language direct, concise, and institutional.`;
 
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
