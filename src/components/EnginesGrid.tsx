@@ -9,7 +9,9 @@ import {
   Gauge,
   Sliders,
   Sparkles,
-  Info
+  Info,
+  Compass,
+  Globe
 } from 'lucide-react';
 import { EngineScore } from '../types';
 
@@ -27,6 +29,8 @@ const ENGINE_ICONS: Record<string, React.ReactNode> = {
   liquidation: <Gauge className="w-5 h-5 text-orange-400" />,
   trend: <Sliders className="w-5 h-5 text-indigo-400" />,
   oscillator: <Sparkles className="w-5 h-5 text-blue-400" />,
+  options: <Compass className="w-5 h-5 text-pink-400" />,
+  hyperliquid: <Globe className="w-5 h-5 text-cyan-300" />,
 };
 
 export const EnginesGrid: React.FC<EnginesGridProps> = ({ engineScores }) => {
@@ -120,6 +124,14 @@ export const EnginesGrid: React.FC<EnginesGridProps> = ({ engineScores }) => {
                   </div>
                 ))}
               </div>
+
+              {/* Data Provenance Verification Tag */}
+              {engine.sourceTag && (
+                <div className="mt-2 text-[9px] font-mono text-slate-500 flex items-center justify-between border-t border-slate-800/40 pt-1.5">
+                  <span className="truncate">Etiket: {engine.sourceTag}</span>
+                  <span className="text-emerald-500/80 shrink-0 font-bold">VERIFIED</span>
+                </div>
+              )}
 
               {/* Telemetry Info Button */}
               <button

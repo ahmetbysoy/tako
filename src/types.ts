@@ -87,6 +87,8 @@ export interface EngineScore {
   status: 'BULLISH' | 'BEARISH' | 'NEUTRAL';
   detail: string;
   metrics: Record<string, string | number>;
+  sourceTag?: string; // e.g. "Binance WS [21:04:12 UTC]"
+  timestamp?: string;
 }
 
 export interface ReasonFactor {
@@ -98,6 +100,15 @@ export interface ReasonFactor {
   impactScore: number;
 }
 
+export interface CalibrationState {
+  rollingAccuracy20: number; // e.g. 0.65 (65%)
+  rollingBrier20: number;    // e.g. 0.18
+  calibrationAdjustment: number; // -15 to +15
+  regimeShiftDetected: boolean;
+  regimeShiftNote?: string;
+  totalPredictionsCount: number;
+}
+
 export interface DecisionSignal {
   direction: SignalDirection;
   longProbability: number;  // 0 - 100%
@@ -106,6 +117,20 @@ export interface DecisionSignal {
   confidence: number;       // 0 - 10.0
   riskLevel: RiskLevel;
   totalScore: number;       // -100 to +100
+  
+  // v3.2 Engine Metric Additions
+  signalStrengthIndex: number; // 0 - 100 Sinyal Gücü Endeksi
+  kellyFraction: number;       // e.g. 0.052 (5.2% account risk recommendation)
+  brierScore: number;          // Rolling Brier score (0 = perfect)
+  calibrationAdjustment: number; // + / - adjustment
+  regimeShiftDetected: boolean;
+  
+  // DEX & Macro Engine Additions
+  hlPrice?: number;
+  hlDivergencePct?: number;    // Hyperliquid DEX vs CEX median divergence
+  netflowUsd?: number;         // Whale Netflow 24h (outflow = positive)
+  macroSentiment?: string;     // e.g. "Extreme Fear (22)"
+  macroModifier?: number;      // e.g. +15
   
   // Scalp Execution targets
   entryPrice: number;
@@ -140,6 +165,10 @@ export interface BacktestRecord {
   confidence: number;
   tpPrice: number;
   slPrice: number;
+  
+  // v3.2 Calibration Metrics
+  brierContribution?: number; // (p_up - actual_up)^2
+  actualDirection?: 'UP' | 'DOWN' | 'FLAT';
   
   // Evaluation after 60s / 3m
   status: 'PENDING' | 'WIN' | 'LOSS' | 'NEUTRAL';

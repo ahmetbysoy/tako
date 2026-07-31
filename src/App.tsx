@@ -17,6 +17,8 @@ import { OrderBookVisualizer } from './components/OrderBookVisualizer';
 import { WhaleLiquidationFeed } from './components/WhaleLiquidationFeed';
 import { BacktestJournal } from './components/BacktestJournal';
 import { GeminiModal } from './components/GeminiModal';
+import { CalibrationPanel } from './components/CalibrationPanel';
+import { BottomNav, AppTab } from './components/BottomNav';
 
 const DEFAULT_SYMBOLS: CryptoSymbol[] = [
   { symbol: 'BTCUSDT', base: 'BTC', quote: 'USDT', name: 'Bitcoin', decimals: 2 },
@@ -71,6 +73,9 @@ export default function App() {
   const [isGeminiModalOpen, setIsGeminiModalOpen] = useState<boolean>(false);
   const [geminiAnalysis, setGeminiAnalysis] = useState<string | null>(null);
   const [isGeminiLoading, setIsGeminiLoading] = useState<boolean>(false);
+  const [isCalibrationOpen, setIsCalibrationOpen] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<AppTab>('signal');
+  const [isFullDashboard, setIsFullDashboard] = useState<boolean>(false);
 
   const streamManagerRef = useRef<MarketStreamManager | null>(null);
   const lastSignalTimeRef = useRef<number>(0);
@@ -262,7 +267,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-emerald-500 selection:text-slate-950 custom-scrollbar">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-pink-950/20 text-slate-100 font-sans selection:bg-pink-500 selection:text-slate-950 custom-scrollbar pb-24">
       {/* Top Bar Header */}
       <Header
         currentSymbol={currentSymbol}
@@ -276,48 +281,187 @@ export default function App() {
         onToggleSound={() => setSoundEnabled(!soundEnabled)}
         onTriggerAiReasoning={handleTriggerAiReasoning}
         isAiLoading={isGeminiLoading}
+        onOpenCalibration={() => setIsCalibrationOpen(true)}
       />
 
-      {/* Main Terminal Container */}
-      <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
-        {/* Section 1: Main 60-Second Alpha Decision Badge */}
-        <MainDecisionCard
-          signal={signal}
-          currentSymbol={currentSymbol}
-          price={price}
-          change24h={change24h}
-        />
+      {/* Responsive View Switcher Bar (Sekmeli Menü & Mod Seçimi) */}
+      <div className="max-w-7xl mx-auto px-4 pt-3 pb-1">
+        <div className="flex items-center justify-between gap-2 p-1.5 bg-slate-900/90 border border-pink-500/20 rounded-2xl backdrop-blur-md">
+          <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar scrollbar-none py-0.5">
+            <button
+              onClick={() => setActiveTab('signal')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === 'signal' && !isFullDashboard
+                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              📊 Sinyal & Karar
+            </button>
+            <button
+              onClick={() => setActiveTab('engines')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === 'engines' && !isFullDashboard
+                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              ⚡ 10 Motor
+            </button>
+            <button
+              onClick={() => setActiveTab('charts')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === 'charts' && !isFullDashboard
+                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              📈 Grafik & Tahta
+            </button>
+            <button
+              onClick={() => setActiveTab('whales')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === 'whales' && !isFullDashboard
+                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              🐋 Balina & Likidasyon
+            </button>
+            <button
+              onClick={() => setActiveTab('journal')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+                activeTab === 'journal' && !isFullDashboard
+                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              📓 Günlük & Kalibrasyon
+            </button>
+          </div>
 
-        {/* Section 2: Dual Pane CVD & Price Live Streaming Chart */}
-        <CvdPriceChart
-          candles={candles}
-          currentSymbol={currentSymbol}
-        />
-
-        {/* Section 3: 10 Specialized Analysis Engines Grid */}
-        {signal && <EnginesGrid engineScores={signal.engineScores} />}
-
-        {/* Section 4: Depth Visualizer & Whale / Liquidation Feeds */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <OrderBookVisualizer
-            orderBook={orderBook}
-            currentSymbol={currentSymbol}
-            price={price}
-          />
-
-          <WhaleLiquidationFeed
-            whales={whales}
-            liquidations={liquidations}
-            currentSymbol={currentSymbol}
-          />
+          <button
+            onClick={() => setIsFullDashboard(!isFullDashboard)}
+            className={`px-3 py-1.5 text-xs font-extrabold rounded-xl border transition-all shrink-0 hidden md:flex items-center gap-1 ${
+              isFullDashboard
+                ? 'bg-pink-500 text-slate-950 border-pink-400 shadow-md shadow-pink-500/20'
+                : 'bg-slate-950 text-pink-300 border-pink-500/30 hover:bg-slate-800'
+            }`}
+          >
+            {isFullDashboard ? '📱 Sekmeli Mobil Mod' : '🖥️ Tüm Paneller'}
+          </button>
         </div>
+      </div>
 
-        {/* Section 5: Backtest Journal & Signal Performance History */}
-        <BacktestJournal
-          records={backtestRecords}
-          onClearHistory={handleClearHistory}
-        />
+      {/* Main Terminal Content - Tabbed or Full Dashboard */}
+      <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+        {isFullDashboard ? (
+          /* Full Desktop Grid View */
+          <>
+            <MainDecisionCard
+              signal={signal}
+              currentSymbol={currentSymbol}
+              price={price}
+              change24h={change24h}
+            />
+
+            <CvdPriceChart
+              candles={candles}
+              currentSymbol={currentSymbol}
+            />
+
+            {signal && <EnginesGrid engineScores={signal.engineScores} />}
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <OrderBookVisualizer
+                orderBook={orderBook}
+                currentSymbol={currentSymbol}
+                price={price}
+              />
+
+              <WhaleLiquidationFeed
+                whales={whales}
+                liquidations={liquidations}
+                currentSymbol={currentSymbol}
+              />
+            </div>
+
+            <BacktestJournal
+              records={backtestRecords}
+              onClearHistory={handleClearHistory}
+            />
+          </>
+        ) : (
+          /* Tabbed Mobile Native Layout */
+          <>
+            {activeTab === 'signal' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <MainDecisionCard
+                  signal={signal}
+                  currentSymbol={currentSymbol}
+                  price={price}
+                  change24h={change24h}
+                />
+                <CvdPriceChart
+                  candles={candles}
+                  currentSymbol={currentSymbol}
+                />
+              </div>
+            )}
+
+            {activeTab === 'engines' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                {signal && <EnginesGrid engineScores={signal.engineScores} />}
+              </div>
+            )}
+
+            {activeTab === 'charts' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <CvdPriceChart
+                  candles={candles}
+                  currentSymbol={currentSymbol}
+                />
+                <OrderBookVisualizer
+                  orderBook={orderBook}
+                  currentSymbol={currentSymbol}
+                  price={price}
+                />
+              </div>
+            )}
+
+            {activeTab === 'whales' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <WhaleLiquidationFeed
+                  whales={whales}
+                  liquidations={liquidations}
+                  currentSymbol={currentSymbol}
+                />
+              </div>
+            )}
+
+            {activeTab === 'journal' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <BacktestJournal
+                  records={backtestRecords}
+                  onClearHistory={handleClearHistory}
+                />
+              </div>
+            )}
+          </>
+        )}
       </main>
+
+      {/* Mobile Bottom Navigation Toolbar (Altta Navigasyon Toolbar) */}
+      <BottomNav
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          setIsFullDashboard(false);
+        }}
+        signalDirection={signal?.direction}
+        onTriggerAi={handleTriggerAiReasoning}
+        isAiLoading={isGeminiLoading}
+      />
 
       {/* Institutional Gemini AI Analysis Modal */}
       <GeminiModal
@@ -327,6 +471,17 @@ export default function App() {
         isLoading={isGeminiLoading}
         symbol={currentSymbol.symbol}
       />
+
+      {/* Autonomous Calibration & Diagnostics Panel v3.2 */}
+      {signal && (
+        <CalibrationPanel
+          isOpen={isCalibrationOpen}
+          onClose={() => setIsCalibrationOpen(false)}
+          calibrationState={signal.calibrationState}
+          records={backtestRecords}
+          symbol={currentSymbol.symbol}
+        />
+      )}
     </div>
   );
 }

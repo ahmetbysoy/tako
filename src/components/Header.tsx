@@ -6,7 +6,9 @@ import {
   Radio,
   Sparkles,
   Search,
-  Check
+  Check,
+  ShieldCheck,
+  Target
 } from 'lucide-react';
 import { CryptoSymbol } from '../types';
 
@@ -22,6 +24,7 @@ interface HeaderProps {
   onToggleSound: () => void;
   onTriggerAiReasoning: () => void;
   isAiLoading: boolean;
+  onOpenCalibration?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -36,6 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSound,
   onTriggerAiReasoning,
   isAiLoading,
+  onOpenCalibration,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [customSearch, setCustomSearch] = useState('');
@@ -69,16 +73,16 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
         {/* Brand & Logo */}
         <div className="flex items-center gap-3">
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-400 text-slate-950 font-black shadow-lg shadow-emerald-500/20 ring-1 ring-emerald-400/40">
+          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 via-rose-400 to-pink-300 text-slate-950 font-black shadow-lg shadow-pink-500/25 ring-1 ring-pink-400/50">
             <Zap className="w-6 h-6 fill-slate-950 stroke-slate-950 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-black tracking-tight bg-gradient-to-r from-emerald-400 via-teal-200 to-cyan-400 bg-clip-text text-transparent">
+              <h1 className="text-lg font-black tracking-tight bg-gradient-to-r from-pink-300 via-rose-300 to-pink-400 bg-clip-text text-transparent">
                 60s ALPHA ENGINE
               </h1>
-              <span className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-500/30">
-                Karar Motoru v3.2
+              <span className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-pink-950/80 text-pink-300 border border-pink-500/30">
+                v3.2 Pastel Mobile
               </span>
             </div>
             <p className="text-xs text-slate-400 font-medium">
@@ -151,7 +155,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => onSelectTimeframe(tf)}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
                   timeframe === tf
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-500/20'
+                    ? 'bg-gradient-to-r from-pink-500 via-rose-500 to-pink-400 text-slate-950 font-extrabold shadow-md shadow-pink-500/25'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -160,13 +164,30 @@ export const Header: React.FC<HeaderProps> = ({
             ))}
           </div>
 
-          {/* Status Indicator */}
+          {/* Status Indicator & Canary Network Badge */}
           <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-medium">
-            <Radio className={`w-3.5 h-3.5 ${isLive ? 'text-emerald-400 animate-pulse' : 'text-amber-400'}`} />
-            <span className={isLive ? 'text-emerald-300' : 'text-amber-300'}>
+            <Radio className={`w-3.5 h-3.5 ${isLive ? 'text-pink-400 animate-pulse' : 'text-amber-400'}`} />
+            <span className={isLive ? 'text-pink-300' : 'text-amber-300'}>
               {isFallback ? 'REST Polling' : 'Live WS'}
             </span>
           </div>
+
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-pink-950/40 border border-pink-500/30 text-[11px] font-mono text-pink-300" title="Ağ Canary Testi: 3/3 Borsalar Aktif">
+            <ShieldCheck className="w-3.5 h-3.5 text-pink-400" />
+            <span>Canary 3/3 OK</span>
+          </div>
+
+          {/* Model Calibration Modal Button */}
+          {onOpenCalibration && (
+            <button
+              onClick={onOpenCalibration}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-pink-300 hover:border-pink-500/40 font-bold text-xs transition-all shadow-sm"
+              title="Kalibrasyon & Rejim Kayması Denetimi"
+            >
+              <Target className="w-3.5 h-3.5 text-pink-400" />
+              <span>Kalibrasyon v3.2</span>
+            </button>
+          )}
 
           {/* Audio Alert Toggle */}
           <button

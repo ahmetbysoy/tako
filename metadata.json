@@ -1,6 +1,6 @@
 {
   "name": "60s Alpha Decision Engine - High Frequency Trading Terminal",
-  "description": "Sub-second 60-second crypto decision engine combining 10 specialized analysis engines: Price, Volume, Order Flow, CVD, Order Book, Open Interest, Liquidations, Trend, Oscillators, and AI Score Engine with Fake Breakout & Liquidity Magnet Detection.",
+  "description": "Sub-second 60-second crypto decision engine combining 10 specialized analysis engines: Price, Volume, Order Flow, CVD, Order Book, Open Interest, Liquidations, Trend, Options & Macro, Hyperliquid DEX & Netflow with Brier calibration & Signal Strength Index.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
