@@ -179,7 +179,7 @@ export default function App() {
           status: 'PENDING',
         };
 
-        pendingSignalsRef.current.unshift(record);
+        pendingSignalsRef.current = [record, ...pendingSignalsRef.current.slice(0, 49)];
 
         // Evaluate signal 60s later
         setTimeout(() => {
@@ -243,12 +243,14 @@ export default function App() {
       });
 
       const data = await res.json();
-      if (data.analysis) {
+      if (!res.ok) {
+        setGeminiAnalysis(`⚠️ ${data.error || data.fallback || 'AI Analizi alınamadı.'}`);
+      } else if (data.analysis) {
         setGeminiAnalysis(data.analysis);
       } else if (data.fallback) {
         setGeminiAnalysis(`⚠️ ${data.fallback}`);
       } else {
-        setGeminiAnalysis('AI Analizi oluşturulurken hata meydana geldi.');
+        setGeminiAnalysis('AI Analizi oluşturulurken beklenmeyen yanıt alındı.');
       }
     } catch {
       setGeminiAnalysis('Sunucu bağlantı hatası.');

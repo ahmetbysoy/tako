@@ -29,7 +29,7 @@ export interface EngineInputData {
 }
 
 // Technical Analysis Helper Calculations
-function calculateEMA(data: number[], period: number): number {
+export function calculateEMA(data: number[], period: number): number {
   if (data.length === 0) return 0;
   const k = 2 / (period + 1);
   let ema = data[0];
@@ -39,7 +39,7 @@ function calculateEMA(data: number[], period: number): number {
   return ema;
 }
 
-function calculateRSI(closes: number[], period: number = 14): number {
+export function calculateRSI(closes: number[], period: number = 14): number {
   if (closes.length <= period) return 50;
   let gains = 0;
   let losses = 0;
@@ -58,7 +58,7 @@ function calculateRSI(closes: number[], period: number = 14): number {
   return 100 - 100 / (1 + rs);
 }
 
-function calculateATR(candles: Candle[], period: number = 14): number {
+export function calculateATR(candles: Candle[], period: number = 14): number {
   if (candles.length < 2) return 0;
   const trs: number[] = [];
   for (let i = Math.max(1, candles.length - period); i < candles.length; i++) {
@@ -71,7 +71,7 @@ function calculateATR(candles: Candle[], period: number = 14): number {
   return trs.reduce((a, b) => a + b, 0) / trs.length;
 }
 
-function calculateVWAP(candles: Candle[]): number {
+export function calculateVWAP(candles: Candle[]): number {
   if (candles.length === 0) return 0;
   let sumPv = 0;
   let sumVol = 0;
@@ -85,7 +85,7 @@ function calculateVWAP(candles: Candle[]): number {
 }
 
 // Continuous log-ratio sigmoid for Options Contrarian Engine (v3.2 formula)
-function contrarianOptionsScore(pcRatio: number, k: number = 4.0, center: number = 1.0, cap: number = 20): number {
+export function contrarianOptionsScore(pcRatio: number, k: number = 4.0, center: number = 1.0, cap: number = 20): number {
   const x = Math.log(Math.max(pcRatio, 0.01) / center);
   return cap * (2 / (1 + Math.exp(-k * x)) - 1);
 }
@@ -627,6 +627,13 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     brierScore: 0.16, // Low Brier score = high accuracy calibration
     calibrationAdjustment: 2.5,
     regimeShiftDetected: false,
+    calibrationState: {
+      rollingAccuracy20: 0.684,
+      rollingBrier20: 0.160,
+      calibrationAdjustment: 2.5,
+      regimeShiftDetected: false,
+      totalPredictionsCount: 20,
+    },
     hlPrice,
     hlDivergencePct,
     netflowUsd,

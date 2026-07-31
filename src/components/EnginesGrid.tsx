@@ -127,9 +127,15 @@ export const EnginesGrid: React.FC<EnginesGridProps> = ({ engineScores }) => {
 
               {/* Data Provenance Verification Tag */}
               {engine.sourceTag && (
-                <div className="mt-2 text-[9px] font-mono text-slate-500 flex items-center justify-between border-t border-slate-800/40 pt-1.5">
-                  <span className="truncate">Etiket: {engine.sourceTag}</span>
-                  <span className="text-emerald-500/80 shrink-0 font-bold">VERIFIED</span>
+                <div className="mt-2 text-[9px] font-mono flex items-center justify-between border-t border-slate-800/40 pt-1.5">
+                  <span className="truncate text-slate-500">Kaynak: {engine.sourceTag}</span>
+                  <span className={`shrink-0 font-bold px-1.5 py-0.2 rounded text-[8px] ${
+                    engine.sourceTag.includes('Simul') || engine.sourceTag.includes('Deriv')
+                      ? 'bg-amber-950/60 text-amber-400 border border-amber-800/40'
+                      : 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40'
+                  }`}>
+                    {engine.sourceTag.includes('Simul') || engine.sourceTag.includes('Deriv') ? 'DERIVED' : 'LIVE WS'}
+                  </span>
                 </div>
               )}
 
