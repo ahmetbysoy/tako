@@ -1,11 +1,13 @@
 /**
- * 60s Alpha Decision Engine - TypeScript Type Definitions
+ * Tako v7.0 Tactical HFT Command Center - Type Definitions
+ * 100% Type-Safe Contracts for Pre-Breakout HFT Pipeline
  */
 
 export type SignalDirection = 'LONG' | 'SHORT' | 'NEUTRAL';
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME';
-export type ExchangeSource = 'BINANCE' | 'OKX' | 'BYBIT' | 'SIMULATED';
+export type ExchangeSource = 'BINANCE' | 'OKX' | 'BYBIT' | 'MEXC' | 'SIMULATED';
 export type ThemeMode = 'pastel' | 'dark';
+export type MarketRegimeType = 'TRENDING' | 'RANGING' | 'VOLATILE' | 'SCANNING';
 
 export interface CryptoSymbol {
   symbol: string;      // e.g. "BTCUSDT"
@@ -39,14 +41,14 @@ export interface TradeTick {
   id: string;
   price: number;
   qty: number;
-  notional: number; // price * qty
+  notional: number;
   side: 'buy' | 'sell';
   time: number;
   isWhale: boolean;
 }
 
 export interface Candle {
-  time: number; // timestamp in ms
+  time: number;
   open: number;
   high: number;
   low: number;
@@ -60,7 +62,7 @@ export interface Candle {
 export interface LiquidationEvent {
   id: string;
   symbol: string;
-  side: 'BUY' | 'SELL'; // BUY = short liquidated (force buy), SELL = long liquidated (force sell)
+  side: 'BUY' | 'SELL';
   price: number;
   qty: number;
   notional: number;
@@ -75,20 +77,19 @@ export interface WhaleTrade {
   qty: number;
   notional: number;
   time: number;
-  tier: 'MEDIUM' | 'LARGE' | 'MEGA'; // 50k+, 250k+, 1M+
+  tier: 'MEDIUM' | 'LARGE' | 'MEGA';
 }
 
-// 10 Engine Scores & Details
 export interface EngineScore {
   id: string;
   name: string;
   nameTr: string;
   score: number; // -20 to +20 contribution points
-  weight: number; // e.g. 0.12
+  weight: number;
   status: 'BULLISH' | 'BEARISH' | 'NEUTRAL';
   detail: string;
   metrics: Record<string, string | number>;
-  sourceTag?: string; // e.g. "Binance WS [21:04:12 UTC]"
+  sourceTag?: string;
   timestamp?: string;
 }
 
@@ -102,9 +103,9 @@ export interface ReasonFactor {
 }
 
 export interface CalibrationState {
-  rollingAccuracy20: number; // e.g. 0.65 (65%)
-  rollingBrier20: number;    // e.g. 0.18
-  calibrationAdjustment: number; // -15 to +15
+  rollingAccuracy20: number;
+  rollingBrier20: number;
+  calibrationAdjustment: number;
   regimeShiftDetected: boolean;
   regimeShiftNote?: string;
   totalPredictionsCount: number;
@@ -112,47 +113,52 @@ export interface CalibrationState {
 
 export interface DecisionSignal {
   direction: SignalDirection;
-  longProbability: number;  // 0 - 100%
-  shortProbability: number; // 0 - 100%
-  neutralProbability: number; // 0 - 100%
-  confidence: number;       // 0 - 10.0
+  longProbability: number;
+  shortProbability: number;
+  neutralProbability: number;
+  confidence: number; // 0.0 - 10.0
   riskLevel: RiskLevel;
-  totalScore: number;       // -100 to +100
+  totalScore: number; // -100 to +100
   
-  // v3.2 Engine Metric Additions
-  signalStrengthIndex: number; // 0 - 100 Sinyal Gücü Endeksi
-  kellyFraction: number;       // e.g. 0.052 (5.2% account risk recommendation)
-  brierScore: number;          // Rolling Brier score (0 = perfect)
-  calibrationAdjustment: number; // + / - adjustment
+  signalStrengthIndex: number;
+  kellyFraction: number;
+  brierScore: number;
+  calibrationAdjustment: number;
   regimeShiftDetected: boolean;
   calibrationState?: CalibrationState;
   
-  // DEX & Macro Engine Additions
-  hlPrice?: number;
-  hlDivergencePct?: number;    // Hyperliquid DEX vs CEX median divergence
-  netflowUsd?: number;         // Whale Netflow 24h (outflow = positive)
-  macroSentiment?: string;     // e.g. "Extreme Fear (22)"
-  macroModifier?: number;      // e.g. +15
+  // Advanced Quantitative Engine Metrics (v7.0)
+  vpinScore: number;          // Volume-Synchronized Probability of Toxicity (0 - 100)
+  ofiScore: number;           // Order Flow Imbalance (-100 to +100)
+  mplScore: number;           // Microstructure Pressure Level (-100 to +100)
+  painIndex: number;          // Repaint-Free Liquidation Pain Index (0 - 100)
+  marketRegime: MarketRegimeType;
   
-  // Scalp Execution targets
+  hlPrice?: number;
+  hlDivergencePct?: number;
+  netflowUsd?: number;
+  macroSentiment?: string;
+  macroModifier?: number;
+  
+  // Execution Plan Targets
   entryPrice: number;
-  tpPrice: number;          // Take Profit (+0.25% - 0.5%)
-  slPrice: number;          // Stop Loss (-0.15% - 0.3%)
+  tpPrice: number;            // TP1
+  tp2Price: number;           // TP2
+  tp3Price: number;           // TP3
+  slPrice: number;            // SL
   tpPercent: number;
   slPercent: number;
-  recommendedHoldingTime: string; // e.g. "1 - 3 min"
+  recommendedHoldingTime: string;
+  recommendedLeverage: string;
+  invalidationRule: string;
   
-  // Special Engine Detectors
   isFakeBreakout: boolean;
   fakeBreakoutReason?: string;
   liquidityMagnetAbove: number;
   liquidityMagnetBelow: number;
   targetMagnet: number;
   
-  // Breakdown Reasons ("Neden?")
   reasons: ReasonFactor[];
-  
-  // Engine Snapshots
   engineScores: Record<string, EngineScore>;
   timestamp: number;
 }
@@ -167,19 +173,12 @@ export interface BacktestRecord {
   confidence: number;
   tpPrice: number;
   slPrice: number;
-  
-  // v3.2 Calibration Metrics
-  brierContribution?: number; // (p_up - actual_up)^2
-  actualDirection?: 'UP' | 'DOWN' | 'FLAT';
-  
-  // Evaluation after 60s / 3m
   status: 'PENDING' | 'WIN' | 'LOSS' | 'NEUTRAL';
   actualClosePrice60s?: number;
   actualPriceChange60s?: number;
   evaluatedAt?: number;
 }
 
-// v4.0 Paper Trading Engine Types
 export interface PaperPosition {
   id: string;
   symbol: string;
@@ -204,17 +203,15 @@ export interface PaperAccount {
   lossesCount: number;
 }
 
-// v4.0 Smart Alarm Types
 export interface SmartAlert {
   id: string;
-  type: 'SCORE_FLIP' | 'WHALE_WALL' | 'SQUEEZE_CASCADE';
+  type: 'SCORE_FLIP' | 'WHALE_WALL' | 'SQUEEZE_CASCADE' | 'VPIN_TOXIC';
   title: string;
   description: string;
   timestamp: number;
   severity: 'LOW' | 'MEDIUM' | 'HIGH';
 }
 
-// v4.0 Multi-Asset Screener Types
 export interface SymbolScreenerItem {
   symbol: CryptoSymbol;
   price: number;
@@ -224,6 +221,7 @@ export interface SymbolScreenerItem {
   probability: number;
   confidence: number;
   signalStrengthIndex: number;
+  vpinScore: number;
   divergenceTag?: string;
 }
 
@@ -231,8 +229,8 @@ export interface TerminalSettings {
   soundEnabled: boolean;
   timeframe: '1m' | '3m' | '5m' | '15m';
   autoTradeAlerts: boolean;
-  minConfidenceThreshold: number; // e.g. 7.5
-  whaleThresholdUsd: number;      // e.g. 50000
+  minConfidenceThreshold: number;
+  whaleThresholdUsd: number;
   simulationMode: boolean;
   theme: ThemeMode;
 }

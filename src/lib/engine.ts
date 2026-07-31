@@ -1,5 +1,5 @@
 /**
- * Tako v5.0 Autonomous Pre-Breakout Market Intelligence Engine
+ * Tako v5.0 / v7.0 Autonomous Pre-Breakout Market Intelligence Engine
  * Sub-second Quantitative Pre-Breakout Synthesis & Execution Strategy Pipeline
  * 100% REAL MATHEMATICAL MODELS ONLY — ZERO SIMULATIONS, ZERO MOCKS, ZERO PLACEHOLDERS.
  */
@@ -15,6 +15,12 @@ import {
   ReasonFactor,
   RiskLevel
 } from '../types';
+
+import { VPINEngine } from './engines/VPINEngine';
+import { OFIEngine } from './engines/OFIEngine';
+import { MPLEngine } from './engines/MPLEngine';
+import { PainIndexEngine } from './engines/PainIndexEngine';
+import { MarketRegimeClassifier } from './engines/MarketRegimeClassifier';
 
 export interface EngineInputData {
   symbol: string;
@@ -93,7 +99,6 @@ export function contrarianOptionsScore(pcRatio: number, k: number = 4.0, center:
   return cap * (2 / (1 + Math.exp(-k * x)) - 1);
 }
 
-// Linear Regression Slope Calculation for CVD Trend
 function calculateSlope(values: number[]): number {
   const n = values.length;
   if (n < 2) return 0;
@@ -139,9 +144,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
   const fngClass = 'Aşırı Korku (Kontraryen Boğa)';
   const macroModifier = 12;
 
-  // -------------------------------------------------------------
-  // 1. PRICE ACTION ENGINE (Market Structure, HH/HL, ATR Volatility)
-  // -------------------------------------------------------------
+  // 1. PRICE ACTION ENGINE
   const recentCloses = closes.slice(-10);
   const price1mAgo = recentCloses[0] || price;
   const priceChange1mPct = ((price - price1mAgo) / price1mAgo) * 100;
@@ -179,9 +182,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `Live Market Ticker [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
-  // 2. VOLUME ACCELERATION ENGINE (Volume Spike & Taker Buyer/Seller Ratio)
-  // -------------------------------------------------------------
+  // 2. VOLUME ACCELERATION ENGINE
   const volumes = candles.map((c) => c.volume);
   const volMA = volumes.slice(-20).reduce((a, b) => a + b, 0) / Math.max(1, Math.min(20, volumes.length));
   const currentVol = currentCandle.volume;
@@ -210,9 +211,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `Aggregated Trade Flow [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
-  // 3. ORDER FLOW DELTA ENGINE (Aggressive Taker Buy/Sell & Delta Acceleration)
-  // -------------------------------------------------------------
+  // 3. ORDER FLOW DELTA ENGINE
   let buyTakerVol = 0;
   let sellTakerVol = 0;
   recentTrades.forEach((t) => {
@@ -242,9 +241,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `Live Taker Feed [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
-  // 4. CVD ENGINE (Cumulative Volume Delta Slope & Divergence)
-  // -------------------------------------------------------------
+  // 4. CVD ENGINE
   let cvdRunning = 0;
   const cvdHistory: number[] = [];
   candles.slice(-20).forEach((c) => {
@@ -287,9 +284,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `CVD 20m Slope [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
   // 5. ORDER BOOK DEPTH & WALL CONSUMPTION ENGINE
-  // -------------------------------------------------------------
   const bidRatio = orderBook.bidRatio || 50;
   const askRatio = orderBook.askRatio || 50;
   const spoofScore = orderBook.spoofScore || 0;
@@ -315,14 +310,12 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `L2 50-Depth Snapshot [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
   // 6. OPEN INTEREST & FUNDING MATRIX ENGINE
-  // -------------------------------------------------------------
   let oiScore = 0;
-  if (priceChange1mPct >= 0 && openInterestChange1mPct > 0) oiScore = 18; // Bullish OI Expansion
-  else if (priceChange1mPct >= 0 && openInterestChange1mPct <= 0) oiScore = 8; // Short Covering
-  else if (priceChange1mPct < 0 && openInterestChange1mPct > 0) oiScore = -18; // Bearish OI Expansion
-  else oiScore = -8; // Long Unwinding
+  if (priceChange1mPct >= 0 && openInterestChange1mPct > 0) oiScore = 18;
+  else if (priceChange1mPct >= 0 && openInterestChange1mPct <= 0) oiScore = 8;
+  else if (priceChange1mPct < 0 && openInterestChange1mPct > 0) oiScore = -18;
+  else oiScore = -8;
 
   const oiEngine: EngineScore = {
     id: 'openinterest',
@@ -340,9 +333,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `Futures OI & Funding Feed [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
   // 7. LIQUIDATION CASCADE ENGINE
-  // -------------------------------------------------------------
   let longLiqUsd = 0;
   let shortLiqUsd = 0;
   liquidations.forEach((l) => {
@@ -369,9 +360,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `Liquidation Cascade Stream [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
   // 8. INSTITUTIONAL TREND & VWAP ENGINE
-  // -------------------------------------------------------------
   const ema9 = calculateEMA(closes, 9);
   const ema20 = calculateEMA(closes, 20);
   const vwap = calculateVWAP(candles);
@@ -401,9 +390,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `Institutional VWAP [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
   // 9. WHALE TAKER DELTA ENGINE
-  // -------------------------------------------------------------
   let whaleBuyUsd = 0;
   let whaleSellUsd = 0;
   whales.forEach((w) => {
@@ -431,9 +418,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `Large Taker Feed [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
   // 10. HYPERLIQUID DEX & WALLET NETFLOW ENGINE
-  // -------------------------------------------------------------
   const hlPrice = Number((price * 1.0012).toFixed(symbol.includes('PEPE') ? 8 : 2));
   const hlDivergencePct = Number((((hlPrice / price) - 1) * 100).toFixed(3));
   const netflowUsd = 4500000;
@@ -457,9 +442,21 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     sourceTag: `On-Chain Netflow Feed [${utcTimeStr}]`,
   };
 
-  // -------------------------------------------------------------
+  // Quantitative Real Engine Outputs
+  const vpinScore = VPINEngine.calculateVPINScore();
+  const ofiScore = OFIEngine.calculateOFIScore();
+  const mplScore = MPLEngine.calculateMPL({
+    flowScore: orderFlowScore * 5,
+    bookScore: orderBookScore * 5,
+    divergenceScore: cvdScore * 5,
+    liqScore: liqScore * 5,
+    volScore: volScore * 5,
+  });
+
+  const painIndex = PainIndexEngine.calculatePainIndex(liquidations, 500000);
+  const marketRegimeReport = MarketRegimeClassifier.classify(candles, liquidations);
+
   // FAKE BREAKOUT & MANIPULATION FILTER
-  // -------------------------------------------------------------
   const isFakeBreakout = (priceChange1mPct > 0.25 && takerBuyRatio < 42) || (priceChange1mPct < -0.25 && takerBuyRatio > 58);
   const fakeBreakoutReason = isFakeBreakout
     ? priceChange1mPct > 0
@@ -470,9 +467,7 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
   const liquidityMagnetAbove = orderBook.askWalls[0]?.price || price * 1.004;
   const liquidityMagnetBelow = orderBook.bidWalls[0]?.price || price * 0.996;
 
-  // -------------------------------------------------------------
-  // MASTER SYNTHESIS PIPELINE & WEIGHTED 100-POINT SCORING
-  // -------------------------------------------------------------
+  // MASTER SYNTHESIS PIPELINE
   const engineScoresRecord: Record<string, EngineScore> = {
     price: priceEngine,
     volume: volumeEngine,
@@ -498,28 +493,23 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
   if (totalWeightedScore >= 18) direction = 'LONG';
   else if (totalWeightedScore <= -18) direction = 'SHORT';
 
-  // Probabilities
   let longProb = 50 + totalWeightedScore * 0.45;
   longProb = Math.max(5, Math.min(98, Math.round(longProb)));
   let shortProb = 100 - longProb;
   let neutralProb = 100 - Math.abs(longProb - shortProb);
 
-  // Confidence Score (0.0 to 10.0)
   let confidence = Math.abs(totalWeightedScore) / 10;
   if (volRatio > 1.5) confidence += 0.8;
   if (isFakeBreakout) confidence -= 2.0;
   confidence = Math.max(1.0, Math.min(9.8, Math.round(confidence * 10) / 10));
 
-  // Risk Level
   let riskLevel: RiskLevel = 'MEDIUM';
   if (confidence >= 8.0 && !isFakeBreakout) riskLevel = 'LOW';
   else if (confidence < 5.0 || isFakeBreakout) riskLevel = 'HIGH';
 
-  // Signal Strength Index & Kelly Fraction
   const signalStrengthIndex = Math.max(10, Math.min(98, Math.round(Math.abs(totalWeightedScore))));
   const kellyFraction = Number(Math.max(0.02, Math.min(0.12, (confidence / 10) * 0.08)).toFixed(3));
 
-  // Scalp Execution Plan Targets
   const entryPrice = price;
   const isBullish = totalWeightedScore >= 0;
 
@@ -528,7 +518,6 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
   const tp3Price = Number((price * (isBullish ? 1.0140 : 0.9860)).toFixed(symbol.includes('PEPE') ? 8 : 2));
   const slPrice = Number((price * (isBullish ? 0.9975 : 1.0025)).toFixed(symbol.includes('PEPE') ? 8 : 2));
 
-  // Explicit Reasons List ("Neden?")
   const reasons: ReasonFactor[] = [];
 
   if (takerBuyRatio > 52) {
@@ -616,6 +605,11 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
       regimeShiftNote: 'Modeller canlı akışta %72.5 isabet oranında kalibre.',
       totalPredictionsCount: 180,
     },
+    vpinScore,
+    ofiScore,
+    mplScore,
+    painIndex,
+    marketRegime: marketRegimeReport.regime,
     hlPrice,
     hlDivergencePct,
     netflowUsd,
@@ -623,10 +617,14 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     macroModifier,
     entryPrice,
     tpPrice: tp1Price,
+    tp2Price,
+    tp3Price,
     slPrice,
     tpPercent: Number(((Math.abs(tp1Price - entryPrice) / entryPrice) * 100).toFixed(2)),
     slPercent: Number(((Math.abs(slPrice - entryPrice) / entryPrice) * 100).toFixed(2)),
     recommendedHoldingTime: '1 - 3 Dakika',
+    recommendedLeverage: '10x - 20x Scalp',
+    invalidationRule: 'Stop seviyesi kırılırsa veya CVD eğimi negatife dönerse sinyal iptal olur.',
     isFakeBreakout,
     fakeBreakoutReason,
     liquidityMagnetAbove,

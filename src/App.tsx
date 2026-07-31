@@ -329,6 +329,7 @@ export default function App() {
           probability: symSignal.direction === 'LONG' ? symSignal.longProbability : symSignal.shortProbability,
           confidence: symSignal.confidence,
           signalStrengthIndex: symSignal.signalStrengthIndex,
+          vpinScore: symSignal.vpinScore,
           divergenceTag: sym.symbol.includes('SOL') || sym.symbol.includes('PEPE') ? '🚀 BTC Ayrışma' : undefined,
         };
       });
