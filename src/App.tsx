@@ -60,6 +60,9 @@ export default function App() {
     }
   });
 
+  // v4.0 Simple Mode (Minimalist View)
+  const [simpleMode, setSimpleMode] = useState<boolean>(true);
+
   const [currentSymbol, setCurrentSymbol] = useState<CryptoSymbol>(DEFAULT_SYMBOLS[0]);
   const [timeframe, setTimeframe] = useState<'1m' | '3m' | '5m' | '15m'>('1m');
 
@@ -170,6 +173,11 @@ export default function App() {
   // Toggle Theme Function
   const handleToggleTheme = () => {
     setTheme((prev) => (prev === 'pastel' ? 'dark' : 'pastel'));
+  };
+
+  // Toggle Simple Mode Function
+  const handleToggleSimpleMode = () => {
+    setSimpleMode((prev) => !prev);
   };
 
   // Initialize Market Streaming WebSocket / Poller
@@ -523,6 +531,8 @@ export default function App() {
         change24h={change24h}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        simpleMode={simpleMode}
+        onToggleSimpleMode={handleToggleSimpleMode}
       />
 
       {/* Main Content Area */}
@@ -534,99 +544,10 @@ export default function App() {
           theme={theme}
         />
 
-        {/* Desktop View Switcher */}
-        <div className={`hidden md:flex items-center justify-between gap-2 p-1.5 border rounded-2xl shadow-xs transition-all max-w-full overflow-hidden ${
-          isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white/80 border-pink-200/80'
-        }`}>
-          <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar no-scrollbar">
-            <button
-              onClick={() => { setActiveTab('signal'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
-                activeTab === 'signal' && !isFullDashboard
-                  ? 'bg-pink-500 text-white shadow-xs'
-                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
-              }`}
-            >
-              📊 Sinyal
-            </button>
-            <button
-              onClick={() => { setActiveTab('radar'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
-                activeTab === 'radar' && !isFullDashboard
-                  ? 'bg-pink-500 text-white shadow-xs'
-                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
-              }`}
-            >
-              🔍 Multi-Radar
-            </button>
-            <button
-              onClick={() => { setActiveTab('paper'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
-                activeTab === 'paper' && !isFullDashboard
-                  ? 'bg-pink-500 text-white shadow-xs'
-                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
-              }`}
-            >
-              🎯 Paper PnL
-            </button>
-            <button
-              onClick={() => { setActiveTab('engines'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
-                activeTab === 'engines' && !isFullDashboard
-                  ? 'bg-pink-500 text-white shadow-xs'
-                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
-              }`}
-            >
-              ⚡ 10 Motor
-            </button>
-            <button
-              onClick={() => { setActiveTab('charts'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
-                activeTab === 'charts' && !isFullDashboard
-                  ? 'bg-pink-500 text-white shadow-xs'
-                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
-              }`}
-            >
-              📈 Grafik
-            </button>
-            <button
-              onClick={() => { setActiveTab('whales'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
-                activeTab === 'whales' && !isFullDashboard
-                  ? 'bg-pink-500 text-white shadow-xs'
-                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
-              }`}
-            >
-              🐋 Balina & DEX
-            </button>
-            <button
-              onClick={() => { setActiveTab('journal'); setIsFullDashboard(false); }}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
-                activeTab === 'journal' && !isFullDashboard
-                  ? 'bg-pink-500 text-white shadow-xs'
-                  : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
-              }`}
-            >
-              📓 Günlük & Test
-            </button>
-          </div>
-
-          <button
-            onClick={() => setIsFullDashboard(!isFullDashboard)}
-            className={`px-3 py-1 text-xs font-black rounded-xl border transition-all shrink-0 ${
-              isFullDashboard
-                ? 'bg-purple-950 text-white border-purple-900 shadow-xs'
-                : (isDark ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-pink-50 text-purple-900 border-pink-200 hover:bg-pink-100')
-            }`}
-          >
-            {isFullDashboard ? '📱 Sekmeli Mod' : '🖥️ Tüm Paneller'}
-          </button>
-        </div>
-
-        {/* Tabbed or Full View Content */}
-        {isFullDashboard ? (
-          /* Full Desktop Grid View */
-          <>
+        {/* SIMPLE MODE (Default Minimalist Focus View) */}
+        {simpleMode ? (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            {/* 1. Main Decision Signal Card */}
             <MainDecisionCard
               signal={signal}
               currentSymbol={currentSymbol}
@@ -634,94 +555,136 @@ export default function App() {
               change24h={change24h}
             />
 
-            <MultiAssetScreener
-              screenerItems={screenerItems}
-              onSelectSymbol={setCurrentSymbol}
-              currentSymbol={currentSymbol}
-              theme={theme}
-            />
-
-            <PaperTradingPanel
-              account={paperAccount}
-              positions={paperPositions}
-              onOpenPosition={handleOpenPaperPosition}
-              onClosePosition={handleClosePaperPosition}
-              onResetAccount={handleResetPaperAccount}
-              signal={signal}
-              currentSymbol={currentSymbol}
-              price={price}
-              theme={theme}
-            />
-
+            {/* 2. Clean Live Price & CVD Chart */}
             <CvdPriceChart
               candles={candles}
               currentSymbol={currentSymbol}
             />
 
-            {signal && <EnginesGrid engineScores={signal.engineScores} />}
+            {/* Simple Mode Footer Toggle Prompt */}
+            <div className="text-center pt-2">
+              <button
+                onClick={() => setSimpleMode(false)}
+                className={`px-4 py-2 rounded-2xl text-xs font-black transition-all border shadow-xs ${
+                  isDark
+                    ? 'bg-slate-900 border-slate-700 text-purple-400 hover:bg-slate-800'
+                    : 'bg-white border-pink-200 text-purple-900 hover:bg-pink-50'
+                }`}
+              >
+                ⚙️ Tüm Detayları & Pro Verileri Göster (10 Motor, Tahta, Balinalar)
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* PRO MODE (Full Multi-Tab / Full Grid View) */
+          <>
+            {/* Desktop View Switcher */}
+            <div className={`hidden md:flex items-center justify-between gap-2 p-1.5 border rounded-2xl shadow-xs transition-all max-w-full overflow-hidden ${
+              isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white/80 border-pink-200/80'
+            }`}>
+              <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar no-scrollbar">
+                <button
+                  onClick={() => { setActiveTab('signal'); setIsFullDashboard(false); }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
+                    activeTab === 'signal' && !isFullDashboard
+                      ? 'bg-pink-500 text-white shadow-xs'
+                      : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
+                  }`}
+                >
+                  📊 Sinyal
+                </button>
+                <button
+                  onClick={() => { setActiveTab('radar'); setIsFullDashboard(false); }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
+                    activeTab === 'radar' && !isFullDashboard
+                      ? 'bg-pink-500 text-white shadow-xs'
+                      : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
+                  }`}
+                >
+                  🔍 Multi-Radar
+                </button>
+                <button
+                  onClick={() => { setActiveTab('paper'); setIsFullDashboard(false); }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
+                    activeTab === 'paper' && !isFullDashboard
+                      ? 'bg-pink-500 text-white shadow-xs'
+                      : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
+                  }`}
+                >
+                  🎯 Paper PnL
+                </button>
+                <button
+                  onClick={() => { setActiveTab('engines'); setIsFullDashboard(false); }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
+                    activeTab === 'engines' && !isFullDashboard
+                      ? 'bg-pink-500 text-white shadow-xs'
+                      : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
+                  }`}
+                >
+                  ⚡ 10 Motor
+                </button>
+                <button
+                  onClick={() => { setActiveTab('charts'); setIsFullDashboard(false); }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
+                    activeTab === 'charts' && !isFullDashboard
+                      ? 'bg-pink-500 text-white shadow-xs'
+                      : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
+                  }`}
+                >
+                  📈 Grafik
+                </button>
+                <button
+                  onClick={() => { setActiveTab('whales'); setIsFullDashboard(false); }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
+                    activeTab === 'whales' && !isFullDashboard
+                      ? 'bg-pink-500 text-white shadow-xs'
+                      : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
+                  }`}
+                >
+                  🐋 Balina & DEX
+                </button>
+                <button
+                  onClick={() => { setActiveTab('journal'); setIsFullDashboard(false); }}
+                  className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 ${
+                    activeTab === 'journal' && !isFullDashboard
+                      ? 'bg-pink-500 text-white shadow-xs'
+                      : (isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-purple-800 hover:bg-pink-50')
+                  }`}
+                >
+                  📓 Günlük & Test
+                </button>
+              </div>
 
-            <SmartMoneyRadar
-              currentSymbol={currentSymbol}
-              price={price}
-              netflowUsd={signal?.netflowUsd}
-              hlPrice={signal?.hlPrice}
-              hlDivergencePct={signal?.hlDivergencePct}
-              theme={theme}
-            />
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <OrderBookVisualizer
-                orderBook={orderBook}
-                currentSymbol={currentSymbol}
-                price={price}
-              />
-
-              <WhaleLiquidationFeed
-                whales={whales}
-                liquidations={liquidations}
-                currentSymbol={currentSymbol}
-              />
+              <button
+                onClick={() => setIsFullDashboard(!isFullDashboard)}
+                className={`px-3 py-1 text-xs font-black rounded-xl border transition-all shrink-0 ${
+                  isFullDashboard
+                    ? 'bg-purple-950 text-white border-purple-900 shadow-xs'
+                    : (isDark ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-pink-50 text-purple-900 border-pink-200 hover:bg-pink-100')
+                }`}
+              >
+                {isFullDashboard ? '📱 Sekmeli Mod' : '🖥️ Tüm Paneller'}
+              </button>
             </div>
 
-            <BacktestJournal
-              records={backtestRecords}
-              onClearHistory={handleClearHistory}
-              signal={signal}
-              currentSymbol={currentSymbol}
-              price={price}
-            />
-          </>
-        ) : (
-          /* Tabbed Native Layout */
-          <>
-            {activeTab === 'signal' && (
-              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+            {/* Tabbed or Full View Content */}
+            {isFullDashboard ? (
+              /* Full Desktop Grid View */
+              <>
                 <MainDecisionCard
                   signal={signal}
                   currentSymbol={currentSymbol}
                   price={price}
                   change24h={change24h}
                 />
-                <CvdPriceChart
-                  candles={candles}
-                  currentSymbol={currentSymbol}
-                />
-              </div>
-            )}
 
-            {activeTab === 'radar' && (
-              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 <MultiAssetScreener
                   screenerItems={screenerItems}
                   onSelectSymbol={setCurrentSymbol}
                   currentSymbol={currentSymbol}
                   theme={theme}
                 />
-              </div>
-            )}
 
-            {activeTab === 'paper' && (
-              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 <PaperTradingPanel
                   account={paperAccount}
                   positions={paperPositions}
@@ -733,31 +696,14 @@ export default function App() {
                   price={price}
                   theme={theme}
                 />
-              </div>
-            )}
 
-            {activeTab === 'engines' && (
-              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
-                {signal && <EnginesGrid engineScores={signal.engineScores} />}
-              </div>
-            )}
-
-            {activeTab === 'charts' && (
-              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
                 <CvdPriceChart
                   candles={candles}
                   currentSymbol={currentSymbol}
                 />
-                <OrderBookVisualizer
-                  orderBook={orderBook}
-                  currentSymbol={currentSymbol}
-                  price={price}
-                />
-              </div>
-            )}
 
-            {activeTab === 'whales' && (
-              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+                {signal && <EnginesGrid engineScores={signal.engineScores} />}
+
                 <SmartMoneyRadar
                   currentSymbol={currentSymbol}
                   price={price}
@@ -766,16 +712,21 @@ export default function App() {
                   hlDivergencePct={signal?.hlDivergencePct}
                   theme={theme}
                 />
-                <WhaleLiquidationFeed
-                  whales={whales}
-                  liquidations={liquidations}
-                  currentSymbol={currentSymbol}
-                />
-              </div>
-            )}
 
-            {activeTab === 'journal' && (
-              <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <OrderBookVisualizer
+                    orderBook={orderBook}
+                    currentSymbol={currentSymbol}
+                    price={price}
+                  />
+
+                  <WhaleLiquidationFeed
+                    whales={whales}
+                    liquidations={liquidations}
+                    currentSymbol={currentSymbol}
+                  />
+                </div>
+
                 <BacktestJournal
                   records={backtestRecords}
                   onClearHistory={handleClearHistory}
@@ -783,7 +734,102 @@ export default function App() {
                   currentSymbol={currentSymbol}
                   price={price}
                 />
-              </div>
+              </>
+            ) : (
+              /* Tabbed Native Layout */
+              <>
+                {activeTab === 'signal' && (
+                  <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+                    <MainDecisionCard
+                      signal={signal}
+                      currentSymbol={currentSymbol}
+                      price={price}
+                      change24h={change24h}
+                    />
+                    <CvdPriceChart
+                      candles={candles}
+                      currentSymbol={currentSymbol}
+                    />
+                  </div>
+                )}
+
+                {activeTab === 'radar' && (
+                  <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+                    <MultiAssetScreener
+                      screenerItems={screenerItems}
+                      onSelectSymbol={setCurrentSymbol}
+                      currentSymbol={currentSymbol}
+                      theme={theme}
+                    />
+                  </div>
+                )}
+
+                {activeTab === 'paper' && (
+                  <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+                    <PaperTradingPanel
+                      account={paperAccount}
+                      positions={paperPositions}
+                      onOpenPosition={handleOpenPaperPosition}
+                      onClosePosition={handleClosePaperPosition}
+                      onResetAccount={handleResetPaperAccount}
+                      signal={signal}
+                      currentSymbol={currentSymbol}
+                      price={price}
+                      theme={theme}
+                    />
+                  </div>
+                )}
+
+                {activeTab === 'engines' && (
+                  <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+                    {signal && <EnginesGrid engineScores={signal.engineScores} />}
+                  </div>
+                )}
+
+                {activeTab === 'charts' && (
+                  <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+                    <CvdPriceChart
+                      candles={candles}
+                      currentSymbol={currentSymbol}
+                    />
+                    <OrderBookVisualizer
+                      orderBook={orderBook}
+                      currentSymbol={currentSymbol}
+                      price={price}
+                    />
+                  </div>
+                )}
+
+                {activeTab === 'whales' && (
+                  <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+                    <SmartMoneyRadar
+                      currentSymbol={currentSymbol}
+                      price={price}
+                      netflowUsd={signal?.netflowUsd}
+                      hlPrice={signal?.hlPrice}
+                      hlDivergencePct={signal?.hlDivergencePct}
+                      theme={theme}
+                    />
+                    <WhaleLiquidationFeed
+                      whales={whales}
+                      liquidations={liquidations}
+                      currentSymbol={currentSymbol}
+                    />
+                  </div>
+                )}
+
+                {activeTab === 'journal' && (
+                  <div className="space-y-3.5 animate-in fade-in duration-200 max-w-full">
+                    <BacktestJournal
+                      records={backtestRecords}
+                      onClearHistory={handleClearHistory}
+                      signal={signal}
+                      currentSymbol={currentSymbol}
+                      price={price}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
@@ -795,6 +841,7 @@ export default function App() {
         onTabChange={(tab) => {
           setActiveTab(tab);
           setIsFullDashboard(false);
+          setSimpleMode(false);
         }}
         signalDirection={signal?.direction}
         onTriggerAi={handleTriggerAiReasoning}

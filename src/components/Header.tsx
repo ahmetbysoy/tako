@@ -7,7 +7,9 @@ import {
   Check,
   Target,
   Sun,
-  Moon
+  Moon,
+  Zap,
+  SlidersHorizontal
 } from 'lucide-react';
 import { CryptoSymbol, ThemeMode } from '../types';
 
@@ -28,6 +30,8 @@ interface HeaderProps {
   change24h: number;
   theme: ThemeMode;
   onToggleTheme: () => void;
+  simpleMode: boolean;
+  onToggleSimpleMode: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -45,6 +49,8 @@ export const Header: React.FC<HeaderProps> = ({
   change24h,
   theme,
   onToggleTheme,
+  simpleMode,
+  onToggleSimpleMode,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [customSearch, setCustomSearch] = useState('');
@@ -174,7 +180,21 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action Controls (Right Side) */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          {/* Timeframe Selector Pills (Hidden on very small screens < 360px to prevent overflow) */}
+          {/* Simple Mode / Pro Mode Switcher Toggle Pill */}
+          <button
+            onClick={onToggleSimpleMode}
+            className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-black transition-all border ${
+              simpleMode
+                ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white border-pink-400 shadow-xs'
+                : (isDark ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-purple-50 border-purple-200 text-purple-900')
+            }`}
+            title={simpleMode ? 'Sade Mod Aktif (Sadece Grafik & Karar)' : 'Detaylı Pro Moda Geç'}
+          >
+            {simpleMode ? <Zap className="w-3.5 h-3.5 text-amber-300" /> : <SlidersHorizontal className="w-3.5 h-3.5 text-purple-600" />}
+            <span>{simpleMode ? '⚡ Sade Mod' : '⚙️ Pro Mod'}</span>
+          </button>
+
+          {/* Timeframe Selector Pills */}
           <div className={`hidden xs:flex items-center p-0.5 rounded-xl border text-xs ${
             isDark ? 'bg-slate-900 border-slate-800' : 'bg-pink-50/80 border-pink-200/60'
           }`}>
@@ -205,21 +225,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {isDark ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-700" />}
           </button>
-
-          {/* Model Calibration Modal Button */}
-          {onOpenCalibration && (
-            <button
-              onClick={onOpenCalibration}
-              className={`p-1.5 rounded-xl border font-bold text-xs transition-all ${
-                isDark
-                  ? 'bg-slate-900 border-slate-800 text-purple-400 hover:bg-slate-800'
-                  : 'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100'
-              }`}
-              title="Model Kalibrasyon"
-            >
-              <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-500" />
-            </button>
-          )}
 
           {/* Audio Alert Toggle */}
           <button
