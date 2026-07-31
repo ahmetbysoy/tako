@@ -124,6 +124,7 @@ export interface DecisionSignal {
   brierScore: number;          // Rolling Brier score (0 = perfect)
   calibrationAdjustment: number; // + / - adjustment
   regimeShiftDetected: boolean;
+  calibrationState: CalibrationState;
   
   // DEX & Macro Engine Additions
   hlPrice?: number;

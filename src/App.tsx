@@ -180,6 +180,9 @@ export default function App() {
         };
 
         pendingSignalsRef.current.unshift(record);
+        if (pendingSignalsRef.current.length > 50) {
+          pendingSignalsRef.current = pendingSignalsRef.current.slice(0, 50);
+        }
 
         // Evaluate signal 60s later
         setTimeout(() => {
@@ -267,8 +270,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-pink-950/20 text-slate-100 font-sans selection:bg-pink-500 selection:text-slate-950 custom-scrollbar pb-24">
-      {/* Top Bar Header */}
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-purple-50/50 to-pink-100/60 text-slate-800 font-sans selection:bg-pink-300 selection:text-purple-950 custom-scrollbar pb-24">
+      {/* Sleek Ultra-Compact Single-Row Header */}
       <Header
         currentSymbol={currentSymbol}
         onSelectSymbol={setCurrentSymbol}
@@ -282,79 +285,80 @@ export default function App() {
         onTriggerAiReasoning={handleTriggerAiReasoning}
         isAiLoading={isGeminiLoading}
         onOpenCalibration={() => setIsCalibrationOpen(true)}
+        price={price}
+        change24h={change24h}
       />
 
-      {/* Responsive View Switcher Bar (Sekmeli Menü & Mod Seçimi) */}
-      <div className="max-w-7xl mx-auto px-4 pt-3 pb-1">
-        <div className="flex items-center justify-between gap-2 p-1.5 bg-slate-900/90 border border-pink-500/20 rounded-2xl backdrop-blur-md">
-          <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar scrollbar-none py-0.5">
+      {/* Main Content Area */}
+      <main className="max-w-7xl mx-auto p-3 sm:p-5 space-y-4">
+        {/* Desktop View Switcher (Desktop only) */}
+        <div className="hidden md:flex items-center justify-between gap-2 p-1.5 bg-white/80 border border-pink-200/80 rounded-2xl shadow-xs">
+          <div className="flex items-center gap-1">
             <button
-              onClick={() => setActiveTab('signal')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              onClick={() => { setActiveTab('signal'); setIsFullDashboard(false); }}
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'signal' && !isFullDashboard
-                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-pink-500 text-white shadow-xs'
+                  : 'text-purple-800 hover:bg-pink-50'
               }`}
             >
-              📊 Sinyal & Karar
+              📊 Sinyal
             </button>
             <button
-              onClick={() => setActiveTab('engines')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              onClick={() => { setActiveTab('engines'); setIsFullDashboard(false); }}
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'engines' && !isFullDashboard
-                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-pink-500 text-white shadow-xs'
+                  : 'text-purple-800 hover:bg-pink-50'
               }`}
             >
               ⚡ 10 Motor
             </button>
             <button
-              onClick={() => setActiveTab('charts')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              onClick={() => { setActiveTab('charts'); setIsFullDashboard(false); }}
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'charts' && !isFullDashboard
-                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-pink-500 text-white shadow-xs'
+                  : 'text-purple-800 hover:bg-pink-50'
               }`}
             >
-              📈 Grafik & Tahta
+              📈 Grafik
             </button>
             <button
-              onClick={() => setActiveTab('whales')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              onClick={() => { setActiveTab('whales'); setIsFullDashboard(false); }}
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'whales' && !isFullDashboard
-                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-pink-500 text-white shadow-xs'
+                  : 'text-purple-800 hover:bg-pink-50'
               }`}
             >
-              🐋 Balina & Likidasyon
+              🐋 Balina
             </button>
             <button
-              onClick={() => setActiveTab('journal')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              onClick={() => { setActiveTab('journal'); setIsFullDashboard(false); }}
+              className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
                 activeTab === 'journal' && !isFullDashboard
-                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40 shadow-sm shadow-pink-500/10'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-pink-500 text-white shadow-xs'
+                  : 'text-purple-800 hover:bg-pink-50'
               }`}
             >
-              📓 Günlük & Kalibrasyon
+              📓 Günlük & Test
             </button>
           </div>
 
           <button
             onClick={() => setIsFullDashboard(!isFullDashboard)}
-            className={`px-3 py-1.5 text-xs font-extrabold rounded-xl border transition-all shrink-0 hidden md:flex items-center gap-1 ${
+            className={`px-3 py-1 text-xs font-black rounded-xl border transition-all ${
               isFullDashboard
-                ? 'bg-pink-500 text-slate-950 border-pink-400 shadow-md shadow-pink-500/20'
-                : 'bg-slate-950 text-pink-300 border-pink-500/30 hover:bg-slate-800'
+                ? 'bg-purple-950 text-white border-purple-900 shadow-xs'
+                : 'bg-pink-50 text-purple-900 border-pink-200 hover:bg-pink-100'
             }`}
           >
-            {isFullDashboard ? '📱 Sekmeli Mobil Mod' : '🖥️ Tüm Paneller'}
+            {isFullDashboard ? '📱 Sekmeli Mod' : '🖥️ Tüm Paneller'}
           </button>
         </div>
-      </div>
 
-      {/* Main Terminal Content - Tabbed or Full Dashboard */}
-      <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+        {/* Tabbed or Full View Content */}
         {isFullDashboard ? (
           /* Full Desktop Grid View */
           <>
@@ -372,7 +376,7 @@ export default function App() {
 
             {signal && <EnginesGrid engineScores={signal.engineScores} />}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <OrderBookVisualizer
                 orderBook={orderBook}
                 currentSymbol={currentSymbol}
@@ -389,13 +393,16 @@ export default function App() {
             <BacktestJournal
               records={backtestRecords}
               onClearHistory={handleClearHistory}
+              signal={signal}
+              currentSymbol={currentSymbol}
+              price={price}
             />
           </>
         ) : (
-          /* Tabbed Mobile Native Layout */
+          /* Tabbed Native Mobile Layout */
           <>
             {activeTab === 'signal' && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-in fade-in duration-200">
                 <MainDecisionCard
                   signal={signal}
                   currentSymbol={currentSymbol}
@@ -410,13 +417,13 @@ export default function App() {
             )}
 
             {activeTab === 'engines' && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-in fade-in duration-200">
                 {signal && <EnginesGrid engineScores={signal.engineScores} />}
               </div>
             )}
 
             {activeTab === 'charts' && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-in fade-in duration-200">
                 <CvdPriceChart
                   candles={candles}
                   currentSymbol={currentSymbol}
@@ -430,7 +437,7 @@ export default function App() {
             )}
 
             {activeTab === 'whales' && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-in fade-in duration-200">
                 <WhaleLiquidationFeed
                   whales={whales}
                   liquidations={liquidations}
@@ -440,10 +447,13 @@ export default function App() {
             )}
 
             {activeTab === 'journal' && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-in fade-in duration-200">
                 <BacktestJournal
                   records={backtestRecords}
                   onClearHistory={handleClearHistory}
+                  signal={signal}
+                  currentSymbol={currentSymbol}
+                  price={price}
                 />
               </div>
             )}
@@ -451,7 +461,7 @@ export default function App() {
         )}
       </main>
 
-      {/* Mobile Bottom Navigation Toolbar (Altta Navigasyon Toolbar) */}
+      {/* Floating Bottom Navigation Bar */}
       <BottomNav
         activeTab={activeTab}
         onTabChange={(tab) => {
@@ -463,7 +473,7 @@ export default function App() {
         isAiLoading={isGeminiLoading}
       />
 
-      {/* Institutional Gemini AI Analysis Modal */}
+      {/* Gemini AI Analysis Modal */}
       <GeminiModal
         isOpen={isGeminiModalOpen}
         onClose={() => setIsGeminiModalOpen(false)}
@@ -472,7 +482,7 @@ export default function App() {
         symbol={currentSymbol.symbol}
       />
 
-      {/* Autonomous Calibration & Diagnostics Panel v3.2 */}
+      {/* Autonomous Calibration Panel */}
       {signal && (
         <CalibrationPanel
           isOpen={isCalibrationOpen}

@@ -19,13 +19,13 @@ interface CvdPriceChartProps {
 export const CvdPriceChart: React.FC<CvdPriceChartProps> = ({ candles, currentSymbol }) => {
   if (!candles || candles.length === 0) {
     return (
-      <div className="h-72 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-center text-slate-500 text-xs">
+      <div className="h-64 bg-white/80 border border-pink-200 rounded-3xl flex items-center justify-center text-purple-600 text-xs font-bold">
         Grafik yükleniyor...
       </div>
     );
   }
 
-  // Compute CVD running values & EMAs for chart display
+  // Compute CVD running values for chart display
   let runningCvd = 0;
   const chartData = candles.slice(-40).map((c) => {
     const delta = c.buyVolume - c.sellVolume;
@@ -51,44 +51,41 @@ export const CvdPriceChart: React.FC<CvdPriceChartProps> = ({ candles, currentSy
   const priceMargin = (maxPrice - minPrice) * 0.15 || 10;
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-800 pb-3">
+    <div className="bg-white/90 border border-pink-200/80 rounded-3xl p-4 shadow-sm shadow-pink-100/50">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-pink-100 pb-2.5">
         <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-purple-400" />
-          <h3 className="text-sm font-black text-slate-100 uppercase tracking-tight">
+          <span className="text-lg">📈</span>
+          <h3 className="text-xs font-black text-purple-950 uppercase tracking-tight">
             Fiyat & CVD (Cumulative Volume Delta) Canlı Grafik
           </h3>
         </div>
 
-        <div className="flex items-center gap-4 text-xs font-semibold">
-          <span className="flex items-center gap-1.5 text-emerald-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" /> Fiyat Kapanış
+        <div className="flex items-center gap-3 text-[11px] font-bold">
+          <span className="flex items-center gap-1 text-emerald-700">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" /> Fiyat
           </span>
-          <span className="flex items-center gap-1.5 text-purple-400">
-            <span className="w-2 h-2 rounded-full bg-purple-400" /> CVD Çizgisi
-          </span>
-          <span className="flex items-center gap-1.5 text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-slate-400" /> Hacim Deltası
+          <span className="flex items-center gap-1 text-purple-700">
+            <span className="w-2 h-2 rounded-full bg-purple-500" /> CVD Çizgisi
           </span>
         </div>
       </div>
 
       {/* Dual Pane Layout */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Pane 1: Live Price Chart */}
-        <div className="h-52 w-full">
+        <div className="h-48 w-full min-h-[180px]">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-              <XAxis dataKey="time" stroke="#64748b" fontSize={10} tickLine={false} />
+              <XAxis dataKey="time" stroke="#a21caf" fontSize={10} tickLine={false} />
               <YAxis
                 domain={[minPrice - priceMargin, maxPrice + priceMargin]}
-                stroke="#64748b"
+                stroke="#a21caf"
                 fontSize={10}
                 orientation="right"
                 tickFormatter={(v) => v.toFixed(currentSymbol.decimals)}
               />
               <Tooltip
-                contentStyle={{ backgroundColor: '#090d16', borderColor: '#1e293b', borderRadius: '12px', fontSize: '11px' }}
+                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#fbcfe8', borderRadius: '16px', fontSize: '11px', color: '#1e1b4b', boxShadow: '0 10px 15px -3px rgba(244, 114, 182, 0.2)' }}
                 formatter={(val: any, name: any) => [
                   typeof val === 'number' ? val.toFixed(currentSymbol.decimals) : val,
                   name === 'close' ? 'Fiyat' : name
@@ -98,25 +95,25 @@ export const CvdPriceChart: React.FC<CvdPriceChartProps> = ({ candles, currentSy
                 type="monotone"
                 dataKey="close"
                 stroke="#10b981"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 dot={false}
-                activeDot={{ r: 5, fill: '#34d399' }}
+                activeDot={{ r: 5, fill: '#059669' }}
               />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
 
         {/* Pane 2: CVD Line & Volume Delta Bar Chart */}
-        <div className="h-32 w-full border-t border-slate-800/80 pt-2">
-          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-            Kumülatif Hacim Deltası (CVD & Taker Imbalance)
+        <div className="h-28 w-full min-h-[100px] border-t border-pink-100 pt-2">
+          <div className="text-[10px] font-bold text-purple-700 uppercase tracking-wider mb-1">
+            Kumülatif Hacim Deltası (CVD)
           </div>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <XAxis dataKey="time" hide />
-              <YAxis orientation="right" stroke="#64748b" fontSize={9} />
+              <YAxis orientation="right" stroke="#a21caf" fontSize={9} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#090d16', borderColor: '#1e293b', borderRadius: '12px', fontSize: '11px' }}
+                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#fbcfe8', borderRadius: '16px', fontSize: '11px', color: '#1e1b4b' }}
                 formatter={(val: any, name: any) => [
                   typeof val === 'number' ? val.toFixed(1) : val,
                   name === 'cvd' ? 'CVD Kumülatif' : name === 'delta' ? 'Mum Deltası' : name
@@ -127,15 +124,15 @@ export const CvdPriceChart: React.FC<CvdPriceChartProps> = ({ candles, currentSy
                   <Cell
                     key={`cell-${index}`}
                     fill={entry.delta >= 0 ? '#10b981' : '#f43f5e'}
-                    opacity={0.6}
+                    opacity={0.7}
                   />
                 ))}
               </Bar>
               <Line
                 type="monotone"
                 dataKey="cvd"
-                stroke="#c084fc"
-                strokeWidth={2.5}
+                stroke="#a855f7"
+                strokeWidth={2}
                 dot={false}
               />
             </ComposedChart>

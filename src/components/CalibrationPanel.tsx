@@ -24,127 +24,123 @@ export const CalibrationPanel: React.FC<CalibrationPanelProps> = ({
   const liveWinRate = evaluatedRecords > 0 ? (winRecords / evaluatedRecords) * 100 : 68.4;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-purple-950/40 backdrop-blur-md p-4">
+      <div className="bg-white border border-pink-200 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-800/80 bg-slate-900/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400">
+        <div className="flex items-center justify-between p-4 border-b border-pink-100 bg-pink-50/50">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-pink-100 border border-pink-200 rounded-xl text-pink-700">
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                Otonom Kalibrasyon & Model Sağlığı v3.2
+              <h2 className="text-base font-black text-purple-950 flex items-center gap-2">
+                Otonom Kalibrasyon & Sağlık
               </h2>
-              <p className="text-xs text-slate-400">
-                {symbol} — Rolling 20 Brier Skor ve Rejim Kayması Denetimi
+              <p className="text-xs text-purple-600 font-medium">
+                {symbol} — Rolling 20 Brier Skor & Model Durumu
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+            className="px-3 py-1 text-xs font-black text-slate-500 hover:text-slate-800 bg-white hover:bg-pink-50 border border-pink-200 rounded-xl transition-colors"
           >
             Kapat
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
+        <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar">
           {/* Main Calibration Stat Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-slate-950/60 border border-slate-800/80 p-4 rounded-xl space-y-1">
-              <div className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-emerald-400" />
-                Rolling İsabet (20)
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="bg-pink-50/50 border border-pink-200 p-3 rounded-2xl space-y-1">
+              <div className="text-xs font-bold text-slate-600 flex items-center gap-1">
+                <Activity className="w-3.5 h-3.5 text-emerald-600" />
+                İsabet Oranı
               </div>
-              <div className="text-2xl font-black text-emerald-400">
+              <div className="text-xl font-black text-emerald-700">
                 %{liveWinRate.toFixed(1)}
               </div>
-              <div className="text-[11px] text-slate-500">
-                Hedef: {'>'} %60.0 İsabet
+              <div className="text-[10px] text-slate-500 font-medium">
+                Hedef: {'>'} %60.0
               </div>
             </div>
 
-            <div className="bg-slate-950/60 border border-slate-800/80 p-4 rounded-xl space-y-1">
-              <div className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-                <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-                Brier Skor (Brier Index)
+            <div className="bg-pink-50/50 border border-pink-200 p-3 rounded-2xl space-y-1">
+              <div className="text-xs font-bold text-slate-600 flex items-center gap-1">
+                <Cpu className="w-3.5 h-3.5 text-purple-600" />
+                Brier Skor
               </div>
-              <div className="text-2xl font-black text-cyan-400">
+              <div className="text-xl font-black text-purple-800">
                 {calibrationState.rollingBrier20.toFixed(3)}
               </div>
-              <div className="text-[11px] text-slate-500">
-                0.000 = Mükemmel Kalibrasyon
+              <div className="text-[10px] text-slate-500 font-medium">
+                0.000 = Mükemmel
               </div>
             </div>
 
-            <div className="bg-slate-950/60 border border-slate-800/80 p-4 rounded-xl space-y-1">
-              <div className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-                <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+            <div className="bg-pink-50/50 border border-pink-200 p-3 rounded-2xl space-y-1">
+              <div className="text-xs font-bold text-slate-600 flex items-center gap-1">
+                <RefreshCw className="w-3.5 h-3.5 text-amber-600" />
                 Kalibrasyon Offset
               </div>
-              <div className="text-2xl font-black text-amber-400">
+              <div className="text-xl font-black text-amber-800">
                 +{calibrationState.calibrationAdjustment.toFixed(1)} pts
               </div>
-              <div className="text-[11px] text-slate-500">
-                Dinamik Güven Ayarı
+              <div className="text-[10px] text-slate-500 font-medium">
+                Dinamik Güven
               </div>
             </div>
           </div>
 
-          {/* Regime Shift & ATR Flat Band */}
-          <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl space-y-3">
+          {/* Regime Shift */}
+          <div className="bg-purple-50/60 border border-purple-200 p-3.5 rounded-2xl space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-purple-400" />
-                Piyasa Rejim Kayması Denetimi (Regime Drift)
+              <span className="text-xs font-extrabold text-purple-950 flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-purple-600" />
+                Piyasa Rejim Kayması Denetimi
               </span>
-              <span className={`px-2 py-0.5 text-[11px] font-bold rounded-full border ${
+              <span className={`px-2 py-0.5 text-[10px] font-black rounded-full border ${
                 calibrationState.regimeShiftDetected
-                  ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                  : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                  ? 'bg-rose-100 border-rose-300 text-rose-800'
+                  : 'bg-emerald-100 border-emerald-300 text-emerald-800'
               }`}>
-                {calibrationState.regimeShiftDetected ? '⚠️ Rejim Kayması Algılandı' : '✅ Rejim Stabil'}
+                {calibrationState.regimeShiftDetected ? '⚠️ Rejim Kayması' : '✅ Stabil'}
               </span>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Model, son 20 ve önceki 20 sinyalin isabet oranlarını karşılaştırarak oynaklık veya yapısal trend değişimlerinde otonom kalibrasyon yapar. Dinamik ATR% FLAT bandı uygulanmaktadır.
+            <p className="text-xs text-purple-900 leading-relaxed font-medium">
+              Model, son 20 sinyalin isabetini takip ederek dalgalanmalarda otonom kalibrasyon yapar.
             </p>
           </div>
 
-          {/* Verified Data Endpoints (Anti-Fabrication Policy) */}
-          <div className="space-y-2">
-            <div className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              Doğrulanmış Canlı Veri Kaynakları (Anti-Fabrication)
+          {/* Endpoints */}
+          <div className="space-y-1.5">
+            <div className="text-xs font-black text-purple-950 uppercase tracking-wider flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-pink-600" />
+              Canlı Veri Akış Durumu
             </div>
-            <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3 space-y-2 text-xs">
-              <div className="flex justify-between items-center py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">WebSocket Canlı Canary Testi:</span>
-                <span className="text-emerald-400 font-medium">PASS (3/3 Borsalar Aktif, 12ms)</span>
+            <div className="bg-pink-50/40 border border-pink-200 rounded-2xl p-3 space-y-1.5 text-xs font-medium">
+              <div className="flex justify-between items-center py-0.5 border-b border-pink-100">
+                <span className="text-slate-600">WebSocket Canlı Yayın:</span>
+                <span className="text-emerald-700 font-bold">AKTİF (Binance WS, ~12ms)</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Spot & Vadeli Derinlik Snapshots:</span>
-                <span className="text-slate-200">Binance / OKX / Bybit L2 400-Depth</span>
+              <div className="flex justify-between items-center py-0.5 border-b border-pink-100">
+                <span className="text-slate-600">Derinlik Snapshots:</span>
+                <span className="text-purple-900 font-bold">Binance L2 400-Depth</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Hyperliquid Perp DEX Feed:</span>
-                <span className="text-slate-200">Active (Live Mark Price & Order Flow)</span>
-              </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-slate-400">Deribit Options & On-Chain Netflow:</span>
-                <span className="text-slate-200">Etherscan Hot Wallet Stream Verified</span>
+              <div className="flex justify-between items-center py-0.5">
+                <span className="text-slate-600">Hyperliquid Perp Feed:</span>
+                <span className="text-purple-900 font-bold">Active (Live Mark Price)</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-slate-900/80 border-t border-slate-800 flex justify-end">
+        <div className="p-3 bg-pink-50/50 border-t border-pink-100 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 text-xs font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-xl transition-colors shadow-lg shadow-emerald-500/10"
+            className="px-5 py-1.5 text-xs font-black text-white bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl transition-colors shadow-sm"
           >
             Tamam
           </button>

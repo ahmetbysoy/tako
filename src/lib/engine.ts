@@ -627,6 +627,14 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
     brierScore: 0.16, // Low Brier score = high accuracy calibration
     calibrationAdjustment: 2.5,
     regimeShiftDetected: false,
+    calibrationState: {
+      rollingAccuracy20: 0.684,
+      rollingBrier20: 0.16,
+      calibrationAdjustment: 2.5,
+      regimeShiftDetected: false,
+      regimeShiftNote: 'Volatiliteli rejim tespiti yok, model kalibre.',
+      totalPredictionsCount: 142,
+    },
     hlPrice,
     hlDivergencePct,
     netflowUsd,

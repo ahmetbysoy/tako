@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import {
-  Zap,
   Volume2,
   VolumeX,
-  Radio,
   Sparkles,
   Search,
   Check,
-  ShieldCheck,
   Target
 } from 'lucide-react';
 import { CryptoSymbol } from '../types';
@@ -25,6 +22,8 @@ interface HeaderProps {
   onTriggerAiReasoning: () => void;
   isAiLoading: boolean;
   onOpenCalibration?: () => void;
+  price: number;
+  change24h: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -34,12 +33,13 @@ export const Header: React.FC<HeaderProps> = ({
   timeframe,
   onSelectTimeframe,
   isLive,
-  isFallback,
   soundEnabled,
   onToggleSound,
   onTriggerAiReasoning,
   isAiLoading,
   onOpenCalibration,
+  price,
+  change24h,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [customSearch, setCustomSearch] = useState('');
@@ -68,58 +68,53 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  return (
-    <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 text-slate-100 shadow-xl">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-        {/* Brand & Logo */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 via-rose-400 to-pink-300 text-slate-950 font-black shadow-lg shadow-pink-500/25 ring-1 ring-pink-400/50">
-            <Zap className="w-6 h-6 fill-slate-950 stroke-slate-950 animate-pulse" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-black tracking-tight bg-gradient-to-r from-pink-300 via-rose-300 to-pink-400 bg-clip-text text-transparent">
-                60s ALPHA ENGINE
-              </h1>
-              <span className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-pink-950/80 text-pink-300 border border-pink-500/30">
-                v3.2 Pastel Mobile
-              </span>
-            </div>
-            <p className="text-xs text-slate-400 font-medium">
-              Sub-second High-Frequency Trading & 10-Engine Terminal
-            </p>
-          </div>
-        </div>
+  const formattedPrice = price.toLocaleString(undefined, {
+    minimumFractionDigits: currentSymbol.decimals,
+    maximumFractionDigits: currentSymbol.decimals,
+  });
 
-        {/* Symbol Dropdown & Timeframe Selectors */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Symbol Selector Dropdown */}
+  return (
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-pink-200/80 px-3 py-2 text-slate-800 shadow-sm shadow-pink-100/50">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+        {/* Brand & Symbol Switcher (Left Side) */}
+        <div className="flex items-center gap-2">
+          {/* Cute Tako Logo */}
+          <div className="flex items-center gap-1.5 font-black text-base text-purple-900 tracking-tight select-none">
+            <span className="text-2xl animate-bounce hover:scale-125 transition-transform cursor-pointer" title="Tako 🐙">
+              🐙
+            </span>
+            <span className="bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent font-extrabold text-lg">
+              TAKO
+            </span>
+          </div>
+
+          {/* Symbol Selector Dropdown Pill */}
           <div className="relative">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-slate-700/80 hover:border-emerald-500/50 text-slate-100 px-3.5 py-1.5 rounded-xl font-bold text-sm transition-all shadow-inner"
+              className="flex items-center gap-1.5 bg-pink-50 hover:bg-pink-100/80 border border-pink-200/80 text-purple-900 px-2.5 py-1 rounded-xl font-black text-xs sm:text-sm transition-all shadow-inner"
             >
-              <span className="text-emerald-400 font-extrabold">{currentSymbol.base}</span>
-              <span className="text-slate-500 text-xs">/ {currentSymbol.quote}</span>
-              <span className="text-slate-400 text-xs">▼</span>
+              <span className="text-pink-600 font-extrabold">{currentSymbol.base}</span>
+              <span className="text-purple-400 text-[11px]">/ USDT</span>
+              <span className="text-pink-400 text-[10px]">▼</span>
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute left-0 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute left-0 mt-1.5 w-60 bg-white border border-pink-200 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
                 <form onSubmit={handleCustomSubmit} className="mb-2">
                   <div className="relative">
-                    <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-slate-400" />
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-pink-400" />
                     <input
                       type="text"
-                      placeholder="Symbol ara veya yaz (örn: PEPE)"
+                      placeholder="Coin ara (örn: PEPE, SOL)"
                       value={customSearch}
                       onChange={(e) => setCustomSearch(e.target.value)}
-                      className="w-full bg-slate-950 text-slate-100 text-xs pl-8 pr-3 py-2 rounded-lg border border-slate-800 focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-pink-50/50 text-purple-950 text-xs pl-8 pr-2 py-1.5 rounded-xl border border-pink-200 focus:outline-none focus:border-pink-500 font-medium"
                     />
                   </div>
                 </form>
 
-                <div className="max-h-56 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                <div className="max-h-48 overflow-y-auto space-y-0.5 pr-1 custom-scrollbar">
                   {filteredSymbols.map((s) => (
                     <button
                       key={s.symbol}
@@ -127,18 +122,18 @@ export const Header: React.FC<HeaderProps> = ({
                         onSelectSymbol(s);
                         setIsDropdownOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-xl font-bold transition-all ${
                         currentSymbol.symbol === s.symbol
-                          ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/30'
-                          : 'hover:bg-slate-800 text-slate-300'
+                          ? 'bg-pink-100 text-pink-700 border border-pink-300'
+                          : 'hover:bg-purple-50 text-slate-700'
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-100">{s.base}</span>
-                        <span className="text-slate-500 text-[10px]">{s.name}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span>{s.base}</span>
+                        <span className="text-slate-400 text-[10px] font-normal">{s.name}</span>
                       </div>
                       {currentSymbol.symbol === s.symbol && (
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <Check className="w-3.5 h-3.5 text-pink-600" />
                       )}
                     </button>
                   ))}
@@ -147,45 +142,42 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Timeframe Buttons */}
-          <div className="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
-            {(['1m', '3m', '5m', '15m'] as const).map((tf) => (
+          {/* Compact Live Price Badge */}
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-purple-50 border border-purple-200/80 rounded-xl text-xs font-mono font-black text-purple-900">
+            <span>${formattedPrice}</span>
+            <span className={`text-[10px] px-1 rounded ${change24h >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+              {change24h >= 0 ? '+' : ''}{change24h.toFixed(1)}%
+            </span>
+          </div>
+        </div>
+
+        {/* Action Controls (Right Side - 1 Compact Row) */}
+        <div className="flex items-center gap-1.5">
+          {/* Timeframe Selector Pills */}
+          <div className="flex items-center bg-pink-50/80 p-0.5 rounded-xl border border-pink-200/60 text-xs">
+            {(['1m', '3m', '5m'] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => onSelectTimeframe(tf)}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
+                className={`px-2 py-0.5 text-[11px] font-bold rounded-lg transition-all ${
                   timeframe === tf
-                    ? 'bg-gradient-to-r from-pink-500 via-rose-500 to-pink-400 text-slate-950 font-extrabold shadow-md shadow-pink-500/25'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-sm'
+                    : 'text-purple-700 hover:text-pink-600'
                 }`}
               >
-                {tf} {tf === '1m' && '⚡ (60s)'}
+                {tf}
               </button>
             ))}
-          </div>
-
-          {/* Status Indicator & Canary Network Badge */}
-          <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-900/80 border border-slate-800 text-xs font-medium">
-            <Radio className={`w-3.5 h-3.5 ${isLive ? 'text-pink-400 animate-pulse' : 'text-amber-400'}`} />
-            <span className={isLive ? 'text-pink-300' : 'text-amber-300'}>
-              {isFallback ? 'REST Polling' : 'Live WS'}
-            </span>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-pink-950/40 border border-pink-500/30 text-[11px] font-mono text-pink-300" title="Ağ Canary Testi: 3/3 Borsalar Aktif">
-            <ShieldCheck className="w-3.5 h-3.5 text-pink-400" />
-            <span>Canary 3/3 OK</span>
           </div>
 
           {/* Model Calibration Modal Button */}
           {onOpenCalibration && (
             <button
               onClick={onOpenCalibration}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-pink-300 hover:border-pink-500/40 font-bold text-xs transition-all shadow-sm"
-              title="Kalibrasyon & Rejim Kayması Denetimi"
+              className="p-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 font-bold text-xs transition-all shadow-sm"
+              title="Model Kalibrasyon"
             >
-              <Target className="w-3.5 h-3.5 text-pink-400" />
-              <span>Kalibrasyon v3.2</span>
+              <Target className="w-4 h-4 text-purple-600" />
             </button>
           )}
 
@@ -193,10 +185,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onToggleSound}
             title={soundEnabled ? 'Sesli Uyarı Açık' : 'Sesli Uyarı Kapalı'}
-            className={`p-2 rounded-xl border transition-all ${
+            className={`p-1.5 rounded-xl border transition-all ${
               soundEnabled
-                ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/60'
-                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+                ? 'bg-pink-100 border-pink-300 text-pink-700'
+                : 'bg-slate-100 border-slate-200 text-slate-400'
             }`}
           >
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -206,10 +198,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onTriggerAiReasoning}
             disabled={isAiLoading}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold text-xs shadow-lg shadow-purple-500/20 border border-purple-400/30 transition-all disabled:opacity-50"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:to-indigo-600 text-white font-extrabold text-xs shadow-md shadow-pink-200 transition-all active:scale-95 disabled:opacity-50"
           >
             <Sparkles className={`w-3.5 h-3.5 ${isAiLoading ? 'animate-spin' : ''}`} />
-            <span>{isAiLoading ? 'AI Analiz Ediyor...' : 'AI Derin Analiz'}</span>
+            <span className="hidden sm:inline">{isAiLoading ? 'Analiz...' : 'AI Analiz'}</span>
           </button>
         </div>
       </div>
