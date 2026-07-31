@@ -510,8 +510,9 @@ export function evaluateAllEngines(input: EngineInputData): DecisionSignal {
 
   // Scalp Execution Targets (1 - 3 minute scalp target)
   const entryPrice = price;
-  const tpMultiplier = direction === 'LONG' ? 1.0035 : direction === 'SHORT' ? 0.9965 : 1.0;
-  const slMultiplier = direction === 'LONG' ? 0.9980 : direction === 'SHORT' ? 1.0020 : 1.0;
+  const isBullishBias = totalWeightedScore >= 0;
+  const tpMultiplier = direction === 'LONG' ? 1.0035 : direction === 'SHORT' ? 0.9965 : (isBullishBias ? 1.0035 : 0.9965);
+  const slMultiplier = direction === 'LONG' ? 0.9980 : direction === 'SHORT' ? 1.0020 : (isBullishBias ? 0.9980 : 1.0020);
   
   const tpPrice = Number((price * tpMultiplier).toFixed(symbol.includes('PEPE') ? 8 : 2));
   const slPrice = Number((price * slMultiplier).toFixed(symbol.includes('PEPE') ? 8 : 2));

@@ -25,7 +25,6 @@ interface MainDecisionCardProps {
 export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
   signal,
   currentSymbol,
-  price,
 }) => {
   const [isReasonsExpanded, setIsReasonsExpanded] = useState(true);
 
@@ -47,7 +46,7 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
     ? signal.shortProbability
     : signal.neutralProbability;
 
-  const formattedPrice = price.toLocaleString(undefined, {
+  const entryPriceFormatted = signal.entryPrice.toLocaleString(undefined, {
     minimumFractionDigits: currentSymbol.decimals,
     maximumFractionDigits: currentSymbol.decimals,
   });
@@ -180,7 +179,7 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
                   <span>Giriş</span>
                 </div>
                 <div className="text-[11px] sm:text-sm font-black font-mono text-purple-950 truncate">
-                  ${formattedPrice}
+                  ${entryPriceFormatted}
                 </div>
               </div>
 
@@ -255,7 +254,7 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between font-bold text-slate-900 gap-1">
-                    <span className="truncate">{r.title}</span>
+                    <span className="break-words">{r.title}</span>
                     <span className="text-[9px] opacity-70 font-mono shrink-0">
                       [{r.engine}]
                     </span>
