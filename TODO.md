@@ -1,75 +1,50 @@
-# 🐙 Tako v4.0 (Autonomous Alpha Trading Terminal) - Tüm Modüller & Sade Mod
+# 🐙 Tako v5.0 Master Release (Autonomous Real-Time Pre-Breakout HFT Engine)
 
-Bu doküman, **ahmetbysoy/tako** projesinde geliştirdiğimiz, sadeleştirdiğimiz ve GitHub repona push ettiğimiz tüm **kullanıcı odaklı sadeleştirme, AI Grafik Çizgileri ve Sesli Okuyucu modüllerini** içerir.
-
----
-
-## 🎯 1. Kullanıcı Odaklı Felsefe: "İnsan Makine Değildir, Zaman Değerlidir" (Yeni Sade Mod)
-
-- **Problem:** Ekranda 50 farklı karmaşık rakam, CVD, OI, Spoof Score, Brier Skoru vb. verilerin hepsinin aynı anda gösterilmesi kullanıcıda **karar yorgunluğuna (Decision Fatigue)** yol açıyordu.
-- **Çözüm:** **`⚡ Sade Mod (Minimalist Focus Mode)`** varsayılan görünüm yapıldı!
-  - 10 karmaşık matematiksel analiz motoru **arkada (under the hood)** tam kapasite çalışmaya devam eder.
-  - Ekranda kullanıcıya sadece **2 ODAK NOKTASI** sunulur:
-    1. **Neresindeyiz?** 📈 Grafik İçi AI Çizgili Canlı Grafik (Fiyat, Giriş, TP, SL, Mıknatıs Seviyeleri)
-    2. **Nereye Gidiyoruz?** 🐙 Net Yön Sinyali (🚀 LONG %84 | Giriş: $98.500 | TP: $98.850 | Stop: $98.300 | Tako Maskot 1 Cümlelik Özeti & Sesli Okuyucu)
-  - Pro analiz araçları (10 Motor Detayları, Tahta, Balina Akışı, Multi-Radar, Paper PnL) istenildiği an **`⚙️ Pro Mod`** butonuna basılarak açılabilir.
+Bu doküman, **ahmetbysoy/tako** projesinde tamamen **%100 Canlı Gerçek Piyasa Verileriyle (OKX & Binance WS / REST)** çalışan, **SIFIR Simülasyon, SIFIR Mock Veri ve SIFIR Yer Tutucu** ilkesiyle sıfırdan yapılandırılan **Tako v5.0 Otonom Karar Motoru** mimarisini açıklar.
 
 ---
 
-## 🎨 2. Grafik İçi AI Seviyeleri & Sesli Okuyucu (Yeni Eklendi)
+## 🚀 Tako v5.0 Mimari İlkeler & Kurallar (Strict Rules Applied)
 
-- [x] **2.1. Grafik İçi AI Fiyat Seviyeleri (Visual Overlays):**
-  - `CvdPriceChart.tsx` bileşenine yapay zekanın ürettiği seviyeler görsel çizgilerle çizildi:
-    - 🟢 **Kar Al (TP):** Yeşil kesikli çizgi (`🟢 TP: $...`)
-    - 🎯 **Giriş (Entry):** Mor kesikli çizgi (`🎯 Giriş: $...`)
-    - 🔴 **Stop Loss (SL):** Kırmızı kesikli çizgi (`🔴 SL: $...`)
-    - 🧲 **Likidasyon Mıknatısı:** Sarı nokta kesikli çizgi (`🧲 Mıknatıs: $...`)
+1. **🚫 Simülasyon, Random (`Math.random()`), Sinüs (`Math.sin()`) BÖĞRÜNDEN SİLİNDİ:**
+   - Kod tabanındaki tüm sentetik veri üreteçleri temizlendi.
+   - Tüm skorlar, mumlar, emir tahtası derinliği, CVD eğimleri ve açık pozisyon değişimleri **milisaniyelik canlı piyasa verileriyle** hesaplanır.
 
-- [x] **2.2. Akıllı Sesli Sinyal Okuyucu (Web Speech Synthesis):**
-  - Tako Maskot kutusuna **`🔊 Sesli Oku`** butonu eklendi. Butona basıldığında Türkçe tarayıcı ses motoruyla Tako'nun 1 cümlelik sinyal kararını sesli olarak okur!
+2. **📡 %100 Canlı Piyasa Veri Toplayıcı (Live OKX & Binance Feed):**
+   - OKX WebSocket Stream (`wss://ws.okx.com:8443/ws/v5/public`) & Server REST Proxy (`/api/market/...`) üzerinden canlı tickers, books, trades, klines, funding rate ve open interest verileri çekilir.
 
----
+3. **🎯 Hareket Başlamadan Önce Erken Yakalama (Pre-Breakout Lead Signal Engine):**
+   - CVD Eğim İvmelenmesi, Agresif Taker Buy/Sell Deltası, Emir Tahtası Duvar Tüketimi (Wall Consumption) ve Açık Pozisyon Genişlemesi (OI Expansion) birleştirilerek kırılım öncesi sinyal üretilir.
 
-## 🚀 3. Tako v4.0 Tamamlanan Tüm Devrimsel Modüller
+4. **🛡️ Sahte Kırılma & Manipülasyon Filtresi (Fake Breakout Filter):**
+   - Bull Trap, Bear Trap, Liquidity Sweep ve Stop Hunt tuzakları otomatik tespit edilip filtrelenir.
 
-### 1. 🎯 Sanal İşlem Engine & Paper Trading (Paper PnL)
-- **Bileşen:** `src/components/PaperTradingPanel.tsx`
-- $10.000 Sanal Bakiye ile risk almadan canlı işlem yapma.
-- 1-Tıkla **"Sanal Long ($1.000)"** ve **"Sanal Short ($1.000)"** pozisyonu açma.
-- Canlı PnL hesabı, TP/SL otonom kapanışlar, Win Rate % istatistikleri.
+5. **📋 Eyleme Dönüştürülebilir Tam İşlem Planı (Complete Trade Plan):**
+   - **Giriş (Entry):** Canlı Fiyat $P_{entry}$
+   - **Kar Al (TP1, TP2, TP3):** $+0.35\%$, $+0.75\%$, $+1.40\%$ kademeli hedefler.
+   - **Stop Loss (SL):** $-0.25\%$ sıkı risk yönetimi.
+   - **İptal Şartı:** Stop seviyesi ihlali veya CVD eğiminin negatife dönmesi.
+   - **Kaldıraç & Risk:** 10x - 20x Scalp / R:R 1.40.
 
-### 2. ⚡ Akıllı Alarm & Bildirim Banner'ı (Smart Alarms)
-- **Bileşen:** `src/components/SmartAlertBanner.tsx`
-- Score Flip (Yön Sıçraması), Spoofing (Sahte Duvar) ve Likidasyon Dalgalarında anlık sesli ve görsel açılır uyarı banner'ı.
-
-### 3. 🔍 Çoklu Sembol Taraması & Radar (Multi-Asset Screener)
-- **Bileşen:** `src/components/MultiAssetScreener.tsx`
-- BTC, ETH, SOL, PEPE, DOGE, XRP, AVAX, LINK, SUI paritelerinin Tako Skorlarını, Yön Kararlarını ve Sinyal Güçlerini matris grid halinde izleme.
-- **BTC Ayrışma (Divergence) Yakalayıcı** ile ayrışan altcoinleri öne çıkarma.
-
-### 4. 🧠 Gemini Copilot "Trade Senaryo Oluşturucu"
-- **Bileşen:** `server.ts` & `GeminiModal.tsx`
-- Gemini AI motoru Türkçe 3 net senaryo üretir:
-  1. 🟢 **Boğa Senaryosu (Bullish Case)**
-  2. 🔴 **Ayı Senaryosu (Bearish Case)**
-  3. 🟨 **Range / Scalp Stratejisi**
-
-### 5. 🐋 Smart Money & DEX Akış Radarı
-- **Bileşen:** `src/components/SmartMoneyRadar.tsx`
-- 24h Borsa Cüzdan Netflow Visualizer & Hyperliquid Leaderboard Whales Live Tracker.
-
-### 6. 🎨 Tek Tıkla Tema Değiştirici (Dark / Pastel Mode Switcher)
-- Header'daki 🌙 / ☀️ butonuna basarak **Soft Pembe/Mor Pastel Moda** ile **Pro Cyberpunk Dark Moda** arasında anında geçiş.
+6. **🔊 Sesli AI Karar Okuyucu & Grafik İçi AI Çizgileri:**
+   - Canlı grafiğin üzerinde TP1, TP2, SL ve Mıknatıs çizgileri görsel olarak çizilir.
+   - Tako Maskot kutusundaki `🔊` butonuna basıldığında karar Türkçe sesli olarak okunur.
 
 ---
 
-## 📄 Proje Dizin Yapısı
+## 📂 Proje Modüler Yapısı
+
 ```
 tako/
+├── server.ts (OKX & Binance Canlı Piyasa Proxy & Gemini 2.5 Flash API)
 ├── src/
+│   ├── lib/
+│   │   ├── websocket.ts (Canlı WS Stream & REST Data Collector - SIFIR Mock)
+│   │   ├── engine.ts (100-Puanlık Pre-Breakout Matematik Pipeline - SIFIR Mock)
+│   │   └── audio.ts (Web Audio Sinyal Sesleri)
 │   ├── components/
 │   │   ├── Header.tsx (Sade Mod & Tema Switcher)
-│   │   ├── MainDecisionCard.tsx (Tako Maskot Yorumu & 🔊 Sesli Okuyucu)
+│   │   ├── MainDecisionCard.tsx (Tako Maskot & 🔊 Sesli Okuyucu)
 │   │   ├── CvdPriceChart.tsx (Visual AI Overlays: TP/SL/Entry/Magnet)
 │   │   ├── PaperTradingPanel.tsx (Sanal İşlem & Paper PnL)
 │   │   ├── MultiAssetScreener.tsx (Çoklu Sembol Radarı)
@@ -81,12 +56,7 @@ tako/
 │   │   ├── BacktestJournal.tsx (Sinyal Geçmişi & Win-Streak)
 │   │   ├── GeminiModal.tsx (Trade Senaryoları)
 │   │   └── BottomNav.tsx (Yüzen Kaydırılabilir Alt Dok)
-│   ├── lib/
-│   │   ├── engine.ts (10-Motor Matematik Pipeline)
-│   │   ├── websocket.ts (Binance WS Stream)
-│   │   └── audio.ts (Web Audio Sinyal Sesleri)
-│   ├── App.tsx (Sade Mod & Pro Mod Controller)
+│   ├── App.tsx (Master Terminal Controller)
 │   └── types.ts (TypeScript Arayüzleri)
-├── server.ts (Express & Gemini API Proxy)
 └── README.md
 ```

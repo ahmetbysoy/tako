@@ -30,6 +30,7 @@ export class MarketStreamManager {
   private isFallbackMode: boolean = false;
   private pollTimer: any = null;
   private callbacks: MarketStreamCallbacks;
+  private lastThrottleTime: number = 0;
 
   // Live Stream State Buffers
   private currentPrice: number = 0;
