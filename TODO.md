@@ -1,6 +1,6 @@
 # 🐙 Tako v4.0 (Autonomous Alpha Trading Terminal) - Tüm Modüller & Sade Mod
 
-Bu doküman, **ahmetbysoy/tako** projesinde geliştirdiğimiz, sadeleştirdiğimiz ve GitHub repona push ettiğimiz tüm **kullanıcı odaklı sadeleştirme ve v4.0 devrimsel modüllerini** içerir.
+Bu doküman, **ahmetbysoy/tako** projesinde geliştirdiğimiz, sadeleştirdiğimiz ve GitHub repona push ettiğimiz tüm **kullanıcı odaklı sadeleştirme, AI Grafik Çizgileri ve Sesli Okuyucu modüllerini** içerir.
 
 ---
 
@@ -10,13 +10,27 @@ Bu doküman, **ahmetbysoy/tako** projesinde geliştirdiğimiz, sadeleştirdiğim
 - **Çözüm:** **`⚡ Sade Mod (Minimalist Focus Mode)`** varsayılan görünüm yapıldı!
   - 10 karmaşık matematiksel analiz motoru **arkada (under the hood)** tam kapasite çalışmaya devam eder.
   - Ekranda kullanıcıya sadece **2 ODAK NOKTASI** sunulur:
-    1. **Neresindeyiz?** 📈 Sade Canlı Grafik (Fiyat ve Hedef Çizgileri)
-    2. **Nereye Gidiyoruz?** 🐙 Net Yön Sinyali (🚀 LONG %84 | Giriş: $98.500 | TP: $98.850 | Stop: $98.300 | Tako Maskot 1 Cümlelik Özeti)
+    1. **Neresindeyiz?** 📈 Grafik İçi AI Çizgili Canlı Grafik (Fiyat, Giriş, TP, SL, Mıknatıs Seviyeleri)
+    2. **Nereye Gidiyoruz?** 🐙 Net Yön Sinyali (🚀 LONG %84 | Giriş: $98.500 | TP: $98.850 | Stop: $98.300 | Tako Maskot 1 Cümlelik Özeti & Sesli Okuyucu)
   - Pro analiz araçları (10 Motor Detayları, Tahta, Balina Akışı, Multi-Radar, Paper PnL) istenildiği an **`⚙️ Pro Mod`** butonuna basılarak açılabilir.
 
 ---
 
-## 🚀 2. Tako v4.0 Tamamlanan Tüm Devrimsel Modüller
+## 🎨 2. Grafik İçi AI Seviyeleri & Sesli Okuyucu (Yeni Eklendi)
+
+- [x] **2.1. Grafik İçi AI Fiyat Seviyeleri (Visual Overlays):**
+  - `CvdPriceChart.tsx` bileşenine yapay zekanın ürettiği seviyeler görsel çizgilerle çizildi:
+    - 🟢 **Kar Al (TP):** Yeşil kesikli çizgi (`🟢 TP: $...`)
+    - 🎯 **Giriş (Entry):** Mor kesikli çizgi (`🎯 Giriş: $...`)
+    - 🔴 **Stop Loss (SL):** Kırmızı kesikli çizgi (`🔴 SL: $...`)
+    - 🧲 **Likidasyon Mıknatısı:** Sarı nokta kesikli çizgi (`🧲 Mıknatıs: $...`)
+
+- [x] **2.2. Akıllı Sesli Sinyal Okuyucu (Web Speech Synthesis):**
+  - Tako Maskot kutusuna **`🔊 Sesli Oku`** butonu eklendi. Butona basıldığında Türkçe tarayıcı ses motoruyla Tako'nun 1 cümlelik sinyal kararını sesli olarak okur!
+
+---
+
+## 🚀 3. Tako v4.0 Tamamlanan Tüm Devrimsel Modüller
 
 ### 1. 🎯 Sanal İşlem Engine & Paper Trading (Paper PnL)
 - **Bileşen:** `src/components/PaperTradingPanel.tsx`
@@ -55,13 +69,13 @@ tako/
 ├── src/
 │   ├── components/
 │   │   ├── Header.tsx (Sade Mod & Tema Switcher)
-│   │   ├── MainDecisionCard.tsx (Tako Maskot Yorumu & Senkronize Hedefler)
+│   │   ├── MainDecisionCard.tsx (Tako Maskot Yorumu & 🔊 Sesli Okuyucu)
+│   │   ├── CvdPriceChart.tsx (Visual AI Overlays: TP/SL/Entry/Magnet)
 │   │   ├── PaperTradingPanel.tsx (Sanal İşlem & Paper PnL)
 │   │   ├── MultiAssetScreener.tsx (Çoklu Sembol Radarı)
 │   │   ├── SmartMoneyRadar.tsx (Netflow & Hyperliquid Whales)
 │   │   ├── SmartAlertBanner.tsx (Akıllı Alarmlar)
 │   │   ├── EnginesGrid.tsx (10 Dokunaç Motoru)
-│   │   ├── CvdPriceChart.tsx (Dual-Pane CVD)
 │   │   ├── OrderBookVisualizer.tsx (L2 Depth & Duvarlar)
 │   │   ├── WhaleLiquidationFeed.tsx (Balina & Likidasyon)
 │   │   ├── BacktestJournal.tsx (Sinyal Geçmişi & Win-Streak)

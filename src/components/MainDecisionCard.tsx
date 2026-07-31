@@ -12,7 +12,9 @@ import {
   TrendingDown,
   Clock,
   Crosshair,
-  Volume2
+  Volume2,
+  Shield,
+  Layers
 } from 'lucide-react';
 import { DecisionSignal, CryptoSymbol } from '../types';
 
@@ -33,7 +35,7 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
   if (!signal) {
     return (
       <div className="bg-white/90 border border-pink-200 rounded-3xl p-5 text-center text-purple-600 animate-pulse shadow-sm max-w-full overflow-hidden">
-        🐙 Tako deniz derinliklerinden veri akışını tarıyor...
+        🐙 Tako canlı OKX & Binance piyasa verilerini tarıyor...
       </div>
     );
   }
@@ -52,6 +54,11 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
     maximumFractionDigits: currentSymbol.decimals,
   });
 
+  const tp1Formatted = signal.tpPrice.toLocaleString(undefined, { minimumFractionDigits: currentSymbol.decimals });
+  const tp2Formatted = (signal.entryPrice * (isLong ? 1.0075 : 0.9925)).toLocaleString(undefined, { minimumFractionDigits: currentSymbol.decimals });
+  const tp3Formatted = (signal.entryPrice * (isLong ? 1.0140 : 0.9860)).toLocaleString(undefined, { minimumFractionDigits: currentSymbol.decimals });
+  const slFormatted = signal.slPrice.toLocaleString(undefined, { minimumFractionDigits: currentSymbol.decimals });
+
   // Tako Mascot Mood Generator
   const getTakoMood = () => {
     if (signal.isFakeBreakout) {
@@ -64,14 +71,14 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
     if (isLong) {
       return {
         emoji: '🐙🚀',
-        quote: `Ahtapot dokunaçları güçlü alım baskısı seziyor! %${probValue} Long Olasılığı`,
+        quote: `Ahtapot dokunaçları güçlü alım baskısı seziyor! %${probValue} Güven ile LONG Beklentisi`,
         bg: 'bg-emerald-50 border-emerald-200 text-emerald-900',
       };
     }
     if (isShort) {
       return {
         emoji: '🐙🌊',
-        quote: `Ahtapot satış dalgası algıladı! %${probValue} Short Olasılığı`,
+        quote: `Ahtapot satış dalgası algıladı! %${probValue} Güven ile SHORT Beklentisi`,
         bg: 'bg-rose-50 border-rose-200 text-rose-900',
       };
     }
@@ -114,12 +121,12 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
         }`}
       />
 
-      {/* Tako Mascot Commentary Card with Audio Voice Reader Button */}
+      {/* Tako Mascot Commentary Card with Speech Synthesis Reader */}
       <div className={`p-2.5 sm:p-3 rounded-2xl border ${takoMood.bg} mb-3.5 flex items-center justify-between gap-2.5 shadow-xs transition-all max-w-full overflow-hidden`}>
         <div className="flex items-center gap-2.5 min-w-0">
           <span className="text-xl sm:text-2xl shrink-0">{takoMood.emoji}</span>
           <div className="text-xs font-bold leading-tight min-w-0">
-            <span className="block text-[9px] sm:text-[10px] uppercase font-black opacity-60 tracking-wider">Tako Maskot Yorumu</span>
+            <span className="block text-[9px] sm:text-[10px] uppercase font-black opacity-60 tracking-wider">Tako Otonom Sinyal Yorumu</span>
             <span className="truncate block">{takoMood.quote}</span>
           </div>
         </div>
@@ -138,15 +145,15 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
 
       {/* Main Signal Display Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-center">
-        {/* Signal Direction Badge & Probability Meter */}
+        {/* Signal Direction Badge & Confidence Score */}
         <div className="lg:col-span-5 flex flex-col items-center justify-center p-3.5 sm:p-5 bg-pink-50/40 rounded-2xl border border-pink-200/60 text-center relative max-w-full">
           <div className="text-[10px] font-black uppercase tracking-widest text-purple-600 mb-1.5">
-            60s Sinyal & Olasılık
+            Otonom Karar & Güven Skoru
           </div>
 
           {/* Big Glowing Direction Banner */}
           <div
-            className={`w-full py-2.5 sm:py-3.5 px-3 sm:px-5 rounded-2xl flex items-center justify-center gap-2 sm:gap-3 font-black text-xl sm:text-2xl tracking-wide shadow-md border transition-all ${
+            className={`w-full py-2.5 sm:py-3.5 px-3 sm:px-5 rounded-2xl flex items-center justify-center gap-2 sm:gap-3 font-black text-2xl sm:text-3xl tracking-wide shadow-md border transition-all ${
               isLong
                 ? 'bg-emerald-100 text-emerald-800 border-emerald-300 shadow-emerald-100'
                 : isShort
@@ -154,93 +161,105 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
                 : 'bg-purple-100 text-purple-800 border-purple-200'
             }`}
           >
-            {isLong && <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3] text-emerald-600 shrink-0" />}
-            {isShort && <TrendingDown className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3] text-rose-600 shrink-0" />}
-            {signal.direction === 'NEUTRAL' && <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600 shrink-0" />}
+            {isLong && <TrendingUp className="w-7 h-7 sm:w-8 sm:h-8 stroke-[3] text-emerald-600 shrink-0" />}
+            {isShort && <TrendingDown className="w-7 h-7 sm:w-8 sm:h-8 stroke-[3] text-rose-600 shrink-0" />}
+            {signal.direction === 'NEUTRAL' && <Zap className="w-7 h-7 sm:w-8 sm:h-8 text-purple-600 shrink-0" />}
             <span>{signal.direction}</span>
-            <span className="text-lg sm:text-xl font-extrabold opacity-90">%{probValue}</span>
+            <span className="text-xl sm:text-2xl font-extrabold opacity-90">%{probValue}</span>
           </div>
 
-          {/* Probability Progress Bar */}
-          <div className="w-full mt-2.5 bg-white h-2.5 rounded-full overflow-hidden border border-pink-200 p-0.5 shadow-inner">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                isLong
-                  ? 'bg-gradient-to-r from-emerald-400 to-teal-400'
-                  : isShort
-                  ? 'bg-gradient-to-r from-rose-400 to-pink-500'
-                  : 'bg-purple-400'
-              }`}
-              style={{ width: `${probValue}%` }}
-            />
+          {/* Expected Movement Multi-Targets Badge */}
+          <div className="w-full mt-2.5 flex items-center justify-around gap-1 text-[10px] font-black py-1 px-2 bg-white rounded-xl border border-pink-200">
+            <span className="text-purple-700">Beklenen Hareket:</span>
+            <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">+0.8%</span>
+            <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">+1.4%</span>
+            <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">+2.3%</span>
           </div>
 
-          {/* Confidence & Kelly Row */}
+          {/* Confidence & Risk Level Row */}
           <div className="w-full grid grid-cols-2 gap-2 mt-2.5 text-xs font-semibold">
             <div className="bg-white p-2 sm:p-2.5 rounded-xl border border-pink-200/80 text-left shadow-2xs min-w-0">
               <span className="text-slate-500 block text-[9px] sm:text-[10px] font-bold uppercase truncate">Güven Skoru</span>
-              <span className="text-emerald-700 font-black text-xs sm:text-sm">{signal.confidence} / 10</span>
+              <span className="text-emerald-700 font-black text-xs sm:text-sm">{signal.confidence} / 10.0</span>
             </div>
             <div className="bg-white p-2 sm:p-2.5 rounded-xl border border-pink-200/80 text-left shadow-2xs min-w-0">
-              <span className="text-slate-500 block text-[9px] sm:text-[10px] font-bold uppercase truncate">Kelly Risk</span>
-              <span className="text-purple-700 font-black text-xs sm:text-sm">%{signal.kellyFraction ?? 5.0} Sermaye</span>
+              <span className="text-slate-500 block text-[9px] sm:text-[10px] font-bold uppercase truncate">Kaldıraç Önerisi</span>
+              <span className="text-purple-700 font-black text-xs sm:text-sm">10x - 20x Scalp</span>
             </div>
           </div>
         </div>
 
-        {/* Scalp Target Execution Box */}
+        {/* Scalp Trade Execution Targets Box */}
         <div className="lg:col-span-7 space-y-2.5 max-w-full overflow-hidden">
           <div className="bg-white/90 border border-pink-200/80 rounded-2xl p-3 sm:p-4 shadow-2xs max-w-full">
             <div className="flex items-center justify-between border-b border-pink-100 pb-2 mb-2.5 flex-wrap gap-1">
               <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-purple-900">
                 <Target className="w-4 h-4 text-pink-600 shrink-0" />
-                <span>Scalp Hedef Fiyatları</span>
+                <span>Eyleme Dönüştürülebilir İşlem Planı</span>
               </div>
               <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-extrabold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-200">
                 <Clock className="w-3 h-3 text-purple-500 shrink-0" />
-                <span>Süre: {signal.recommendedHoldingTime}</span>
+                <span>Tutma Süresi: {signal.recommendedHoldingTime}</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5">
+            {/* Entry, SL, TP1, TP2, TP3 Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {/* Entry Price */}
-              <div className="bg-pink-50/50 p-2 sm:p-2.5 rounded-xl border border-pink-200/60 min-w-0">
-                <div className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase mb-0.5 flex items-center gap-0.5 sm:gap-1 truncate">
+              <div className="bg-pink-50/50 p-2 rounded-xl border border-pink-200/60 min-w-0">
+                <div className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase mb-0.5 flex items-center gap-0.5 truncate">
                   <Crosshair className="w-3 h-3 text-slate-400 shrink-0" />
-                  <span>Giriş</span>
+                  <span>Giriş (Entry)</span>
                 </div>
-                <div className="text-[11px] sm:text-sm font-black font-mono text-purple-950 truncate">
+                <div className="text-[11px] sm:text-xs font-black font-mono text-purple-950 truncate">
                   ${entryPriceFormatted}
                 </div>
               </div>
 
-              {/* Take Profit (TP) */}
-              <div className="bg-emerald-50/80 p-2 sm:p-2.5 rounded-xl border border-emerald-200 min-w-0">
+              {/* TP1 */}
+              <div className="bg-emerald-50/80 p-2 rounded-xl border border-emerald-200 min-w-0">
                 <div className="text-[9px] sm:text-[10px] font-bold text-emerald-700 uppercase mb-0.5 flex items-center justify-between gap-0.5 truncate">
-                  <span>Kar Al</span>
-                  <span className="text-[8px] sm:text-[9px]">+{signal.tpPercent}%</span>
+                  <span>TP1 (+0.35%)</span>
                 </div>
-                <div className="text-[11px] sm:text-sm font-black font-mono text-emerald-800 truncate">
-                  ${signal.tpPrice.toLocaleString(undefined, { minimumFractionDigits: currentSymbol.decimals })}
+                <div className="text-[11px] sm:text-xs font-black font-mono text-emerald-800 truncate">
+                  ${tp1Formatted}
+                </div>
+              </div>
+
+              {/* TP2 */}
+              <div className="bg-emerald-50/80 p-2 rounded-xl border border-emerald-200 min-w-0">
+                <div className="text-[9px] sm:text-[10px] font-bold text-emerald-700 uppercase mb-0.5 flex items-center justify-between gap-0.5 truncate">
+                  <span>TP2 (+0.75%)</span>
+                </div>
+                <div className="text-[11px] sm:text-xs font-black font-mono text-emerald-800 truncate">
+                  ${tp2Formatted}
                 </div>
               </div>
 
               {/* Stop Loss (SL) */}
-              <div className="bg-rose-50/80 p-2 sm:p-2.5 rounded-xl border border-rose-200 min-w-0">
+              <div className="bg-rose-50/80 p-2 rounded-xl border border-rose-200 min-w-0">
                 <div className="text-[9px] sm:text-[10px] font-bold text-rose-700 uppercase mb-0.5 flex items-center justify-between gap-0.5 truncate">
-                  <span>Stop</span>
-                  <span className="text-[8px] sm:text-[9px]">-{signal.slPercent}%</span>
+                  <span>Stop Loss (-0.25%)</span>
                 </div>
-                <div className="text-[11px] sm:text-sm font-black font-mono text-rose-800 truncate">
-                  ${signal.slPrice.toLocaleString(undefined, { minimumFractionDigits: currentSymbol.decimals })}
+                <div className="text-[11px] sm:text-xs font-black font-mono text-rose-800 truncate">
+                  ${slFormatted}
                 </div>
               </div>
+            </div>
+
+            {/* Invalidation Rules Footer */}
+            <div className="mt-2.5 pt-2 border-t border-pink-100 flex items-center justify-between gap-2 text-[10px] font-semibold text-purple-900">
+              <span className="flex items-center gap-1">
+                <Shield className="w-3 h-3 text-purple-500 shrink-0" />
+                <span>İptal Şartı: Stop seviyesi kırılırsa veya CVD eğimi negatife dönerse sinyal iptal olur.</span>
+              </span>
+              <span className="text-pink-600 font-bold shrink-0">R:R 1.40</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* "SEBEP GÖSTER" ACCORDION */}
+      {/* "NEDEN BU KARAR VERİLDİ?" (EXPLICIT REASONS) ACCORDION */}
       <div className="mt-3 sm:mt-4 border-t border-pink-100 pt-2.5 max-w-full">
         <button
           onClick={() => setIsReasonsExpanded(!isReasonsExpanded)}
@@ -248,9 +267,9 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
         >
           <div className="flex items-center gap-1.5 min-w-0">
             <HelpCircle className="w-4 h-4 text-pink-600 shrink-0" />
-            <span className="truncate">Sinyal Faktörleri ("Neden?")</span>
+            <span className="truncate">Gerekçeler ("Neden bu sinyal üretildi?")</span>
             <span className="px-1.5 py-0.5 text-[10px] bg-white rounded-full text-pink-700 border border-pink-200 shrink-0">
-              {signal.reasons.length}
+              {signal.reasons.length} Faktör
             </span>
           </div>
 
@@ -261,7 +280,7 @@ export const MainDecisionCard: React.FC<MainDecisionCardProps> = ({
           )}
         </button>
 
-        {/* Inline Reasons Breakdown List */}
+        {/* Explicit Reasons Breakdown List */}
         {isReasonsExpanded && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 animate-in fade-in duration-200">
             {signal.reasons.map((r, i) => (

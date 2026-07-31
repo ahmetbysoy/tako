@@ -12,7 +12,7 @@ async function startServer() {
 
   app.use(express.json({ limit: "5mb" }));
 
-  // API Routes
+  // API Health Endpoint
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
@@ -80,12 +80,14 @@ Keep language direct, concise, and institutional.`;
     }
   });
 
-  // Binance Proxy Fallback for CORS-safe REST data
+  // REAL LIVE MARKET PROXY ENDPOINTS (OKX Public API - 100% Geo-Safe Live Feeds)
   app.get("/api/market/ticker", async (req, res) => {
     try {
-      const symbol = (req.query.symbol as string) || "BTCUSDT";
-      const fetchRes = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
-      if (!fetchRes.ok) throw new Error("Binance ticker fetch failed");
+      const rawSymbol = (req.query.symbol as string) || "BTCUSDT";
+      const base = rawSymbol.replace("USDT", "");
+      const instId = `${base}-USDT`;
+      const fetchRes = await fetch(`https://www.okx.com/api/v5/market/ticker?instId=${instId}`);
+      if (!fetchRes.ok) throw new Error("Ticker fetch failed");
       const data = await fetchRes.json();
       res.json(data);
     } catch (err: any) {
@@ -95,11 +97,15 @@ Keep language direct, concise, and institutional.`;
 
   app.get("/api/market/klines", async (req, res) => {
     try {
-      const symbol = (req.query.symbol as string) || "BTCUSDT";
+      const rawSymbol = (req.query.symbol as string) || "BTCUSDT";
+      const base = rawSymbol.replace("USDT", "");
+      const instId = `${base}-USDT`;
       const interval = (req.query.interval as string) || "1m";
       const limit = (req.query.limit as string) || "60";
-      const fetchRes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);
-      if (!fetchRes.ok) throw new Error("Binance klines fetch failed");
+      
+      const okxBar = interval === "1m" ? "1m" : interval === "3m" ? "3m" : interval === "5m" ? "5m" : "15m";
+      const fetchRes = await fetch(`https://www.okx.com/api/v5/market/candles?instId=${instId}&bar=${okxBar}&limit=${limit}`);
+      if (!fetchRes.ok) throw new Error("Klines fetch failed");
       const data = await fetchRes.json();
       res.json(data);
     } catch (err: any) {
@@ -109,10 +115,12 @@ Keep language direct, concise, and institutional.`;
 
   app.get("/api/market/depth", async (req, res) => {
     try {
-      const symbol = (req.query.symbol as string) || "BTCUSDT";
-      const limit = (req.query.limit as string) || "20";
-      const fetchRes = await fetch(`https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=${limit}`);
-      if (!fetchRes.ok) throw new Error("Binance depth fetch failed");
+      const rawSymbol = (req.query.symbol as string) || "BTCUSDT";
+      const base = rawSymbol.replace("USDT", "");
+      const instId = `${base}-USDT`;
+      const limit = (req.query.limit as string) || "50";
+      const fetchRes = await fetch(`https://www.okx.com/api/v5/market/books?instId=${instId}&sz=${limit}`);
+      if (!fetchRes.ok) throw new Error("Depth fetch failed");
       const data = await fetchRes.json();
       res.json(data);
     } catch (err: any) {
@@ -122,10 +130,40 @@ Keep language direct, concise, and institutional.`;
 
   app.get("/api/market/trades", async (req, res) => {
     try {
-      const symbol = (req.query.symbol as string) || "BTCUSDT";
-      const limit = (req.query.limit as string) || "50";
-      const fetchRes = await fetch(`https://api.binance.com/api/v3/trades?symbol=${symbol}&limit=${limit}`);
-      if (!fetchRes.ok) throw new Error("Binance trades fetch failed");
+      const rawSymbol = (req.query.symbol as string) || "BTCUSDT";
+      const base = rawSymbol.replace("USDT", "");
+      const instId = `${base}-USDT`;
+      const limit = (req.query.limit as string) || "100";
+      const fetchRes = await fetch(`https://www.okx.com/api/v5/market/trades?instId=${instId}&limit=${limit}`);
+      if (!fetchRes.ok) throw new Error("Trades fetch failed");
+      const data = await fetchRes.json();
+      res.json(data);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get("/api/market/funding", async (req, res) => {
+    try {
+      const rawSymbol = (req.query.symbol as string) || "BTCUSDT";
+      const base = rawSymbol.replace("USDT", "");
+      const instId = `${base}-USDT-SWAP`;
+      const fetchRes = await fetch(`https://www.okx.com/api/v5/public/funding-rate?instId=${instId}`);
+      if (!fetchRes.ok) throw new Error("Funding fetch failed");
+      const data = await fetchRes.json();
+      res.json(data);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get("/api/market/open-interest", async (req, res) => {
+    try {
+      const rawSymbol = (req.query.symbol as string) || "BTCUSDT";
+      const base = rawSymbol.replace("USDT", "");
+      const instId = `${base}-USDT-SWAP`;
+      const fetchRes = await fetch(`https://www.okx.com/api/v5/public/open-interest?instType=SWAP&instId=${instId}`);
+      if (!fetchRes.ok) throw new Error("Open Interest fetch failed");
       const data = await fetchRes.json();
       res.json(data);
     } catch (err: any) {
@@ -143,13 +181,13 @@ Keep language direct, concise, and institutional.`;
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get("*", (req, res) => {
+    app.get("*", (_req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[60s Alpha Engine] Server running on http://0.0.0.0:${PORT}`);
+    console.log(`[Tako v5.0 Pre-Breakout Engine] Server running on http://0.0.0.0:${PORT}`);
   });
 }
 
